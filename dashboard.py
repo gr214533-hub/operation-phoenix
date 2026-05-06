@@ -111,24 +111,129 @@ MEASUREMENT_SITES = [
 ]
 
 # ============================================================
-# DATA PERSISTENCE - Google Sheets Backend
+# DATA PERSISTENCE - Google Sheets + Google Drive Backend
 # ============================================================
 import gspread
 from google.oauth2.service_account import Credentials
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+import io
+import base64
 
 SHEET_NAME = st.secrets.get("GOOGLE_SHEET_NAME", "Operation Phoenix Data")
 
 @st.cache_resource(ttl=300)
-def get_gsheet_client():
-    """Create authenticated Google Sheets client from service account credentials."""
+def get_google_creds():
+    """Create Google credentials (shared by Sheets and Drive)."""
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
     ]
-    creds = Credentials.from_service_account_info(
+    return Credentials.from_service_account_info(
         st.secrets["gcp_service_account"], scopes=scopes
     )
-    return gspread.authorize(creds)
+
+@st.cache_resource(ttl=300)
+def get_gsheet_client():
+    """Create authenticated Google Sheets client."""
+    return gspread.authorize(get_google_creds())
+
+@st.cache_resource(ttl=300)
+def get_drive_service():
+    """Create authenticated Google Drive service."""
+    return build("drive", "v3", credentials=get_google_creds())
+
+
+def get_or_create_drive_folder(folder_name, parent_id=None):
+    """Get or create a Google Drive folder, return its ID."""
+    drive = get_drive_service()
+    query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+    if parent_id:
+        query += f" and '{parent_id}' in parents"
+    results = drive.files().list(q=query, spaces="drive", fields="files(id, name)").execute()
+    files = results.get("files", [])
+    if files:
+        return files[0]["id"]
+    # Create folder
+    metadata = {"name": folder_name, "mimeType": "application/vnd.google-apps.folder"}
+    if parent_id:
+        metadata["parents"] = [parent_id]
+    folder = drive.files().create(body=metadata, fields="id").execute()
+    # Share with user's Google account so they can see it too
+    try:
+        drive.permissions().create(
+            fileId=folder["id"],
+            body={"type": "user", "role": "writer", "emailAddress": "guillermoreynag@gmail.com"},
+            sendNotificationEmail=False,
+        ).execute()
+    except:
+        pass
+    return folder["id"]
+
+
+def upload_photo_to_drive(file_data, filename, week_name):
+    """Upload a photo to Google Drive in the week's folder. Returns file ID and web link."""
+    drive = get_drive_service()
+    root_id = get_or_create_drive_folder("Operation Phoenix Photos")
+    week_id = get_or_create_drive_folder(week_name, parent_id=root_id)
+
+    # Check if file already exists (same name in same folder) and delete it
+    query = f"name='{filename}' and '{week_id}' in parents and trashed=false"
+    existing = drive.files().list(q=query, spaces="drive", fields="files(id)").execute().get("files", [])
+    for f in existing:
+        drive.files().delete(fileId=f["id"]).execute()
+
+    # Upload
+    media = MediaIoBaseUpload(io.BytesIO(file_data), mimetype="image/jpeg", resumable=True)
+    metadata = {"name": filename, "parents": [week_id]}
+    uploaded = drive.files().create(body=metadata, media_body=media, fields="id, webViewLink, webContentLink").execute()
+    # Make viewable by anyone with link
+    try:
+        drive.permissions().create(
+            fileId=uploaded["id"],
+            body={"type": "anyone", "role": "reader"},
+        ).execute()
+    except:
+        pass
+    return uploaded["id"], uploaded.get("webViewLink", "")
+
+
+def get_photo_url(file_id):
+    """Get a thumbnail URL for a Drive file."""
+    if not file_id:
+        return None
+    return f"https://drive.google.com/thumbnail?id={file_id}&sz=w400"
+
+
+def get_week_photos(week_name):
+    """Get all photos for a given week from Google Sheets metadata."""
+    meta = get_all_meta()
+    photos = {}
+    for view in ["Front", "Side", "Back"]:
+        key = f"photo_{week_name}_{view}"
+        file_id = meta.get(key, "")
+        if file_id:
+            photos[view] = file_id
+    return photos
+
+
+def save_photo_meta(week_name, view, file_id):
+    """Save photo file ID to metadata."""
+    try:
+        ss = get_spreadsheet()
+        ws_meta = get_or_create_worksheet(ss, "Meta", META_HEADERS)
+        existing_meta = {}
+        for row in ws_meta.get_all_records():
+            if row.get("key"):
+                existing_meta[row["key"]] = row.get("value", "")
+        existing_meta[f"photo_{week_name}_{view}"] = file_id
+        new_rows = [META_HEADERS]
+        for k, v in sorted(existing_meta.items()):
+            new_rows.append([k, str(v)])
+        ws_meta.clear()
+        ws_meta.update("A1", new_rows)
+    except Exception as e:
+        st.warning(f"Could not save photo metadata: {e}")
 
 
 def get_or_create_worksheet(spreadsheet, title, headers):
@@ -354,15 +459,62 @@ def save_whoop_data(data):
 # ============================================================
 # WHOOP API
 # ============================================================
-def get_saved_token():
-    """Get saved Whoop access token from Google Sheets."""
+def get_all_meta():
+    """Get all metadata from Google Sheets as a dict."""
+    meta = {}
     try:
         ss = get_spreadsheet()
         ws_meta = get_or_create_worksheet(ss, "Meta", META_HEADERS)
-        rows = ws_meta.get_all_records()
-        for row in rows:
-            if row.get("key") == "whoop_access_token":
-                return row.get("value")
+        for row in ws_meta.get_all_records():
+            if row.get("key"):
+                meta[row["key"]] = row.get("value", "")
+    except:
+        pass
+    return meta
+
+
+def get_saved_token():
+    """Get saved Whoop access token, auto-refreshing if expired."""
+    meta = get_all_meta()
+    access_token = meta.get("whoop_access_token")
+    refresh_token = meta.get("whoop_refresh_token")
+    saved_at = meta.get("whoop_token_saved_at", "")
+
+    if not access_token:
+        return None
+
+    # Check if token is older than 50 minutes (expires at 60)
+    token_expired = False
+    if saved_at:
+        try:
+            saved_time = datetime.fromisoformat(saved_at)
+            if (datetime.now() - saved_time).total_seconds() > 3000:
+                token_expired = True
+        except:
+            token_expired = True
+
+    # Try to refresh if expired and we have a refresh token
+    if token_expired and refresh_token:
+        new_token = refresh_access_token(refresh_token)
+        if new_token:
+            return new_token
+
+    return access_token
+
+
+def refresh_access_token(refresh_token):
+    """Use refresh token to get a new access token."""
+    try:
+        resp = requests.post(TOKEN_URL, data={
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+        })
+        if resp.status_code == 200:
+            token_data = resp.json()
+            save_token(token_data)
+            return token_data.get("access_token")
     except:
         pass
     return None
@@ -599,6 +751,40 @@ with st.sidebar:
 st.markdown('<p class="main-header">Operation Phoenix</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Peptide Protocol Tracker | May 11 - July 10, 2026</p>', unsafe_allow_html=True)
 
+# ============================================================
+# AUTO-PULL WHOOP DATA (runs once per session, if last pull > 12 hours)
+# ============================================================
+if "auto_pull_done" not in st.session_state:
+    st.session_state.auto_pull_done = False
+
+if not st.session_state.auto_pull_done:
+    st.session_state.auto_pull_done = True
+    try:
+        token = get_saved_token()
+        if token:
+            wd = load_whoop_data()
+            last_pull = wd.get("last_pull", "")
+            should_pull = True
+            if last_pull:
+                try:
+                    last_time = datetime.fromisoformat(last_pull)
+                    hours_ago = (datetime.now() - last_time).total_seconds() / 3600
+                    if hours_ago < 12:
+                        should_pull = False
+                except:
+                    pass
+            if should_pull:
+                start_str = BASELINE_START.isoformat()
+                end_str = (PROTOCOL_END + timedelta(days=3)).isoformat()
+                daily = pull_whoop_data(token, start_str, end_str)
+                if daily:
+                    save_whoop_data({"daily": daily, "last_pull": datetime.now().isoformat()})
+                    # Clear cached whoop data so it reloads
+                    if "whoop_data" in st.session_state:
+                        del st.session_state["whoop_data"]
+    except:
+        pass
+
 tab_overview, tab_whoop, tab_checkin, tab_injections, tab_measurements = st.tabs([
     "\U0001f4ca Overview", "\U0001f4f1 Whoop Data", "\U0001f4cb Weekly Check-in", "\U0001f489 Injection Log", "\U0001f4cf Measurement Guide"
 ])
@@ -793,13 +979,6 @@ with tab_checkin:
                 v = existing.get("subjective", {}).get(item, 5)
                 subjective[item] = st.slider(item, 1, 10, int(v), key=f"s_{item}")
 
-        st.markdown("**Progress Photos**")
-        photos = {}
-        cols = st.columns(3)
-        for i, view in enumerate(["Front", "Side", "Back"]):
-            with cols[i]:
-                photos[view] = st.checkbox(f"{view} photo taken", existing.get("photos", {}).get(view, False), key=f"p_{view}")
-
         notes = st.text_area("Notes", existing.get("notes", ""), key="notes")
 
         if st.form_submit_button("Save Check-in", type="primary", use_container_width=True):
@@ -809,12 +988,44 @@ with tab_checkin:
                 "body_fat": body_fat if body_fat > 0 else None,
                 "measurements": measurements,
                 "subjective": subjective,
-                "photos": photos,
+                "photos": existing.get("photos", {}),
                 "notes": notes,
                 "saved_at": datetime.now().isoformat(),
             }
             save_checkin_data(checkin_data)
             st.success(f"{week_name} check-in saved!")
+
+    # --- Progress Photos (outside form for file upload support) ---
+    st.divider()
+    st.subheader(f"Progress Photos — {week_name}")
+    st.caption("Upload front, side, and back photos. They're stored securely in Google Drive.")
+
+    # Show existing photos
+    week_photos = get_week_photos(week_name)
+    if week_photos:
+        photo_cols = st.columns(len(week_photos))
+        for i, (view, file_id) in enumerate(week_photos.items()):
+            with photo_cols[i]:
+                st.markdown(f"**{view}**")
+                st.image(get_photo_url(file_id), use_container_width=True)
+
+    # Upload new photos
+    upload_cols = st.columns(3)
+    for i, view in enumerate(["Front", "Side", "Back"]):
+        with upload_cols[i]:
+            has_photo = view in week_photos
+            label = f"{'Replace' if has_photo else 'Upload'} {view} photo"
+            uploaded = st.file_uploader(label, type=["jpg", "jpeg", "png"], key=f"photo_{week_name}_{view}")
+            if uploaded:
+                with st.spinner(f"Uploading {view}..."):
+                    filename = f"{week_name}_{view}.jpg"
+                    file_id, link = upload_photo_to_drive(uploaded.getvalue(), filename, week_name)
+                    save_photo_meta(week_name, view, file_id)
+                    # Update checkin data photos
+                    checkin_data.setdefault("checkins", {}).setdefault(week_name, {}).setdefault("photos", {})[view] = True
+                    save_checkin_data(checkin_data)
+                st.success(f"{view} photo uploaded!")
+                st.rerun()
 
     if checkin_data.get("checkins"):
         st.divider()
