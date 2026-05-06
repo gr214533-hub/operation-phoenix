@@ -111,67 +111,288 @@ MEASUREMENT_SITES = [
 ]
 
 # ============================================================
-# DATA PERSISTENCE (JSON in session + file fallback)
+# DATA PERSISTENCE - Google Sheets Backend
 # ============================================================
-DATA_DIR = os.path.dirname(os.path.abspath(__file__))
-CHECKIN_FILE = os.path.join(DATA_DIR, "data", "checkin_data.json")
-WHOOP_FILE = os.path.join(DATA_DIR, "data", "whoop_data.json")
-TOKEN_FILE = os.path.join(DATA_DIR, "data", "whoop_tokens.json")
+import gspread
+from google.oauth2.service_account import Credentials
 
-os.makedirs(os.path.join(DATA_DIR, "data"), exist_ok=True)
+SHEET_NAME = st.secrets.get("GOOGLE_SHEET_NAME", "Operation Phoenix Data")
+
+@st.cache_resource(ttl=300)
+def get_gsheet_client():
+    """Create authenticated Google Sheets client from service account credentials."""
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"], scopes=scopes
+    )
+    return gspread.authorize(creds)
 
 
-def load_json(filepath):
+def get_or_create_worksheet(spreadsheet, title, headers):
+    """Get a worksheet by title, or create it with headers if it doesn't exist."""
     try:
-        if os.path.exists(filepath):
-            with open(filepath) as f:
-                return json.load(f)
-    except:
-        pass
-    return {}
+        ws = spreadsheet.worksheet(title)
+    except gspread.WorksheetNotFound:
+        ws = spreadsheet.add_worksheet(title=title, rows=200, cols=len(headers))
+        ws.update("A1", [headers])
+        ws.format("A1:{}1".format(chr(64 + len(headers))), {"textFormat": {"bold": True}})
+    return ws
 
 
-def save_json(filepath, data):
-    try:
-        with open(filepath, "w") as f:
-            json.dump(data, f, indent=2, default=str)
-    except:
-        pass
+def get_spreadsheet():
+    """Get the Operation Phoenix spreadsheet (cached in session)."""
+    if "gsheet" not in st.session_state:
+        gc = get_gsheet_client()
+        try:
+            st.session_state.gsheet = gc.open(SHEET_NAME)
+        except gspread.SpreadsheetNotFound:
+            st.error(f"Google Sheet '{SHEET_NAME}' not found. Make sure it's shared with the service account email.")
+            st.stop()
+    return st.session_state.gsheet
+
+
+# --- Checkin Data ---
+CHECKIN_HEADERS = ["week", "date", "weight", "body_fat", "measurements_json", "subjective_json", "photos_json", "notes", "saved_at"]
+INJECTION_HEADERS = ["date", "done"]
+WHOOP_HEADERS = ["date", "recovery", "hrv", "rhr", "spo2", "sleep_perf", "sleep_hrs", "resp_rate", "strain", "calories_kj", "workouts_json"]
+META_HEADERS = ["key", "value"]
 
 
 def load_checkin_data():
-    if "checkin_data" not in st.session_state:
-        st.session_state.checkin_data = load_json(CHECKIN_FILE)
-    return st.session_state.checkin_data
+    """Load all check-in and injection data from Google Sheets."""
+    if "checkin_data" in st.session_state:
+        return st.session_state.checkin_data
+
+    data = {"checkins": {}, "injections": {}}
+    try:
+        ss = get_spreadsheet()
+
+        # Load check-ins
+        ws = get_or_create_worksheet(ss, "Checkins", CHECKIN_HEADERS)
+        rows = ws.get_all_records()
+        for row in rows:
+            week = row.get("week", "")
+            if not week:
+                continue
+            entry = {
+                "date": row.get("date", ""),
+                "weight": float(row["weight"]) if row.get("weight") else None,
+                "body_fat": float(row["body_fat"]) if row.get("body_fat") else None,
+                "notes": row.get("notes", ""),
+                "saved_at": row.get("saved_at", ""),
+            }
+            try:
+                entry["measurements"] = json.loads(row.get("measurements_json", "{}"))
+            except:
+                entry["measurements"] = {}
+            try:
+                entry["subjective"] = json.loads(row.get("subjective_json", "{}"))
+            except:
+                entry["subjective"] = {}
+            try:
+                entry["photos"] = json.loads(row.get("photos_json", "{}"))
+            except:
+                entry["photos"] = {}
+            data["checkins"][week] = entry
+
+        # Load injections
+        ws_inj = get_or_create_worksheet(ss, "Injections", INJECTION_HEADERS)
+        inj_rows = ws_inj.get_all_records()
+        for row in inj_rows:
+            if row.get("date"):
+                data["injections"][row["date"]] = str(row.get("done", "")).upper() == "TRUE"
+
+    except Exception as e:
+        st.warning(f"Could not load data from Google Sheets: {e}")
+
+    st.session_state.checkin_data = data
+    return data
 
 
 def save_checkin_data(data):
+    """Save check-in and injection data to Google Sheets."""
     st.session_state.checkin_data = data
-    save_json(CHECKIN_FILE, data)
+    try:
+        ss = get_spreadsheet()
+
+        # Save check-ins
+        ws = get_or_create_worksheet(ss, "Checkins", CHECKIN_HEADERS)
+        rows = [CHECKIN_HEADERS]
+        for week_name in ["Baseline"] + [f"Week {i}" for i in range(1, 10)]:
+            entry = data.get("checkins", {}).get(week_name)
+            if entry:
+                rows.append([
+                    week_name,
+                    entry.get("date", ""),
+                    entry.get("weight", ""),
+                    entry.get("body_fat", "") if entry.get("body_fat") else "",
+                    json.dumps(entry.get("measurements", {})),
+                    json.dumps(entry.get("subjective", {})),
+                    json.dumps(entry.get("photos", {})),
+                    entry.get("notes", ""),
+                    entry.get("saved_at", ""),
+                ])
+        ws.clear()
+        ws.update("A1", rows)
+        if len(rows) > 0:
+            ws.format("A1:{}1".format(chr(64 + len(CHECKIN_HEADERS))), {"textFormat": {"bold": True}})
+
+        # Save injections
+        ws_inj = get_or_create_worksheet(ss, "Injections", INJECTION_HEADERS)
+        inj_rows = [INJECTION_HEADERS]
+        for d_str, done in sorted(data.get("injections", {}).items()):
+            inj_rows.append([d_str, str(done).upper()])
+        ws_inj.clear()
+        ws_inj.update("A1", inj_rows)
+        if len(inj_rows) > 0:
+            ws_inj.format("A1:B1", {"textFormat": {"bold": True}})
+
+    except Exception as e:
+        st.warning(f"Could not save to Google Sheets: {e}")
 
 
 def load_whoop_data():
-    if "whoop_data" not in st.session_state:
-        st.session_state.whoop_data = load_json(WHOOP_FILE)
-    return st.session_state.whoop_data
+    """Load Whoop data from Google Sheets."""
+    if "whoop_data" in st.session_state:
+        return st.session_state.whoop_data
+
+    data = {}
+    try:
+        ss = get_spreadsheet()
+
+        # Load daily data
+        ws = get_or_create_worksheet(ss, "Whoop Daily", WHOOP_HEADERS)
+        rows = ws.get_all_records()
+        daily = {}
+        for row in rows:
+            ds = row.get("date", "")
+            if not ds:
+                continue
+            entry = {}
+            for key in ["recovery", "hrv", "rhr", "spo2", "sleep_perf", "sleep_hrs", "resp_rate", "strain", "calories_kj"]:
+                v = row.get(key)
+                if v != "" and v is not None:
+                    try:
+                        entry[key] = float(v)
+                    except:
+                        pass
+            try:
+                wk = json.loads(row.get("workouts_json", "[]"))
+                if wk:
+                    entry["workouts"] = wk
+            except:
+                pass
+            daily[ds] = entry
+
+        if daily:
+            data["daily"] = daily
+
+        # Load metadata (last_pull, etc.)
+        ws_meta = get_or_create_worksheet(ss, "Meta", META_HEADERS)
+        meta_rows = ws_meta.get_all_records()
+        for row in meta_rows:
+            if row.get("key") == "whoop_last_pull":
+                data["last_pull"] = row.get("value", "")
+
+    except Exception as e:
+        st.warning(f"Could not load Whoop data: {e}")
+
+    st.session_state.whoop_data = data
+    return data
 
 
 def save_whoop_data(data):
+    """Save Whoop data to Google Sheets."""
     st.session_state.whoop_data = data
-    save_json(WHOOP_FILE, data)
+    try:
+        ss = get_spreadsheet()
+
+        # Save daily data
+        ws = get_or_create_worksheet(ss, "Whoop Daily", WHOOP_HEADERS)
+        rows = [WHOOP_HEADERS]
+        for ds in sorted(data.get("daily", {}).keys()):
+            d = data["daily"][ds]
+            rows.append([
+                ds,
+                d.get("recovery", ""),
+                round(d["hrv"], 1) if d.get("hrv") is not None else "",
+                d.get("rhr", ""),
+                d.get("spo2", ""),
+                d.get("sleep_perf", ""),
+                d.get("sleep_hrs", ""),
+                d.get("resp_rate", ""),
+                round(d["strain"], 1) if d.get("strain") is not None else "",
+                d.get("calories_kj", ""),
+                json.dumps(d.get("workouts", [])) if d.get("workouts") else "",
+            ])
+        ws.clear()
+        ws.update("A1", rows)
+        if len(rows) > 0:
+            ws.format("A1:{}1".format(chr(64 + len(WHOOP_HEADERS))), {"textFormat": {"bold": True}})
+
+        # Save metadata (merge, don't overwrite)
+        ws_meta = get_or_create_worksheet(ss, "Meta", META_HEADERS)
+        existing_meta = {}
+        for row in ws_meta.get_all_records():
+            if row.get("key"):
+                existing_meta[row["key"]] = row.get("value", "")
+        if data.get("last_pull"):
+            existing_meta["whoop_last_pull"] = data["last_pull"]
+        meta_rows = [META_HEADERS]
+        for k, v in sorted(existing_meta.items()):
+            meta_rows.append([k, str(v)])
+        ws_meta.clear()
+        ws_meta.update("A1", meta_rows)
+
+    except Exception as e:
+        st.warning(f"Could not save Whoop data: {e}")
 
 
 # ============================================================
 # WHOOP API
 # ============================================================
 def get_saved_token():
-    tokens = load_json(TOKEN_FILE)
-    return tokens.get("access_token")
+    """Get saved Whoop access token from Google Sheets."""
+    try:
+        ss = get_spreadsheet()
+        ws_meta = get_or_create_worksheet(ss, "Meta", META_HEADERS)
+        rows = ws_meta.get_all_records()
+        for row in rows:
+            if row.get("key") == "whoop_access_token":
+                return row.get("value")
+    except:
+        pass
+    return None
 
 
 def save_token(token_data):
-    token_data["saved_at"] = datetime.now().isoformat()
-    save_json(TOKEN_FILE, token_data)
+    """Save Whoop token to Google Sheets."""
+    try:
+        ss = get_spreadsheet()
+        ws_meta = get_or_create_worksheet(ss, "Meta", META_HEADERS)
+        rows = ws_meta.get_all_records()
+
+        # Build updated meta rows
+        meta = {}
+        for row in rows:
+            if row.get("key"):
+                meta[row["key"]] = row.get("value", "")
+
+        meta["whoop_access_token"] = token_data.get("access_token", "")
+        meta["whoop_token_saved_at"] = datetime.now().isoformat()
+        if token_data.get("refresh_token"):
+            meta["whoop_refresh_token"] = token_data["refresh_token"]
+
+        new_rows = [META_HEADERS]
+        for k, v in sorted(meta.items()):
+            new_rows.append([k, str(v)])
+        ws_meta.clear()
+        ws_meta.update("A1", new_rows)
+    except Exception as e:
+        st.warning(f"Could not save token: {e}")
 
 
 def exchange_code_for_token(code):
