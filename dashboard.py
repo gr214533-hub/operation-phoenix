@@ -1641,6 +1641,37 @@ with tab_training:
         },
     }
 
+    # --- Per-Exercise Breathing Guide ---
+    BREATHING = {
+        "Barbell Bench Press": "INHALE at the top (arms locked out). Hold breath as you lower the bar to your chest (3s down). EXHALE through clenched teeth ('tsssss') as you press the bar back up. Arms lock out → inhale again → repeat.",
+        "Barbell Bent-Over Row": "INHALE and brace hard before pulling (arms hanging straight). HOLD breath as you pull bar to ribs. EXHALE through teeth as you lower the bar back down. At bottom (arms straight) → inhale, re-brace → pull again. If your back starts rounding, the brace failed — stop.",
+        "Push-Up": "INHALE at the top (arms locked, plank position). Hold breath as you lower chest to floor (3s). EXHALE through teeth as you press back up. Core brace NEVER fully releases — maintain tension the entire set.",
+        "Landmine Row (single arm)": "INHALE and lightly brace before pulling. Pull to hip. EXHALE through teeth as you lower weight back down. Inhale at bottom → repeat. Keep torso still — the light brace prevents rotation.",
+        "Dips (Matador)": "INHALE at the top (arms locked). Hold breath as you lower yourself down. EXHALE through teeth as you press back up through the hardest part (the bottom). Inhale at top → repeat.",
+        "Barbell Curl": "INHALE at the bottom (arms straight). EXHALE through teeth as you curl up. INHALE as you lower slowly. Light core brace throughout to prevent swaying — if you feel your lower back, you're swinging.",
+        "Pallof Press": "INHALE with band at your chest, draw navel in (TA activation), then brace. EXHALE through teeth as you press the band out. Take small shallow breaths during the 2s hold. Pull band back → full inhale → re-brace → press again.",
+        "Dead Bug": "INHALE with arms up and knees in tabletop. As you extend opposite arm and leg outward, EXHALE FULLY — empty your lungs completely. The full exhale forces your deep core (TA) to fire and keeps lower back pressed to floor. Limbs return → inhale → switch sides → exhale fully again.",
+        "Barbell Front Squat": "INHALE big at the top (standing). Fill belly, sides, and lower back. Brace hard 360 degrees. HOLD BREATH as you squat down — hold it at the bottom too. EXHALE through clenched teeth as you drive up out of the hole. Stand fully → release air → fresh inhale → re-brace → descend again. NEVER let core go slack at the bottom.",
+        "Slant Board Squat": "INHALE at the top (standing). Light brace. EXHALE through teeth on the way up. Simple — this is a lighter exercise.",
+        "Barbell Reverse Lunge": "INHALE and brace BEFORE each step back — every rep gets a fresh brace. Hold breath as you step back and lower. EXHALE through teeth as you drive back up to standing. Re-breathe and re-brace before the next step.",
+        "Nordic Curl Eccentric": "INHALE kneeling upright. Squeeze glutes, brace core. EXHALE very slowly through teeth as you lean forward — make the exhale last the ENTIRE 5-second descent. Catch with hands, push back up → inhale → re-brace → go again.",
+        "Wall Sit": "BREATHE NORMALLY. Do NOT hold your breath — you're holding this for 30+ seconds. Mild brace, press lower back into wall, breathe in and out through your nose at a natural rhythm.",
+        "Heel Slide + TA Engagement": "Draw navel toward spine (TA engaged — stays engaged entire time). INHALE at start. EXHALE slowly as you slide one heel out. INHALE as you slide it back in. TA never releases between reps.",
+        "Landmine Press": "INHALE with bar at shoulder. Brace core HARD (single arm wants to rotate you). EXHALE through teeth as you press up. INHALE as you lower to shoulder. Re-brace each rep.",
+        "Pull-Up (band-assisted)": "INHALE at dead hang (arms fully extended). Pull shoulders down and back. EXHALE through teeth as you pull up (chin over bar). INHALE as you lower slowly (3s) back to dead hang. Core stays engaged to prevent swinging.",
+        "Landmine Lateral Raise": "INHALE with arm at your side. EXHALE through teeth as you raise the bar out to the side. INHALE as you lower slowly. Light brace throughout.",
+        "Band Face Pull": "INHALE with arms extended toward anchor. EXHALE through teeth as you pull toward your face and rotate fists outward. Hold 2s (shallow breaths). INHALE as you return to start.",
+        "Close-Grip Bench Press": "Same as bench press: INHALE at the top (arms locked). Hold breath as you lower to sternum. EXHALE through teeth as you press up. Inhale at lockout → repeat.",
+        "KB Curl": "INHALE at bottom (arm straight). EXHALE through teeth as you curl up. INHALE as you lower slowly. Light brace to prevent swaying.",
+        "Side Plank": "BREATHE NORMALLY throughout the hold. In through nose, out through nose. Don't hold your breath — you'll pass out before the timer runs out. Keep obliques engaged while breathing.",
+        "Deep Neck Flexor Hold": "BREATHE NORMALLY throughout. In through nose, out through mouth. Maintain chin tuck while breathing — the tendency is to lose the tuck when you focus on breathing. Keep it.",
+        "Barbell RDL": "MOST CRITICAL BREATHING. INHALE big at the top — biggest breath of any exercise. Fill everything. Brace as hard as you can. HOLD BREATH ENTIRELY as you push hips back and lower the bar. At the bottom (hamstring stretch) you're still holding. EXHALE through clenched teeth as you drive hips forward to stand. Lock hips, squeeze glutes → release air → fresh big inhale → re-brace. If you feel the brace failing, end the set.",
+        "KB Swing": "UNIQUE RHYTHM. INHALE as you hike the KB back between your legs. EXHALE sharply — a forceful 'HAH!' out of your mouth — as your hips snap forward. This is the one exercise where you exhale through your mouth with force because the movement is explosive. It becomes rhythmic: hike back (inhale) → hip snap (HAH!) → repeat.",
+        "Barbell Hip Thrust": "INHALE at the bottom (hips low). Light brace. EXHALE through teeth as you drive hips up. At the top, squeeze glutes 2s — take small breaths during the hold. Lower slowly → inhale at bottom → repeat.",
+        "Barbell Sumo Squat": "INHALE at the top (standing). Standard brace. Hold breath as you squat down. EXHALE through teeth on the way up. Inhale at top → repeat.",
+        "Bird Dog": "INHALE in starting position (hands and knees). EXHALE slowly as you extend opposite arm and leg. Hold 2s at top — small breath. INHALE as you return. Core stays engaged throughout.",
+    }
+
     # --- Session Layouts ---
     SESSIONS = {
         "Upper A — Monday": [
@@ -1706,6 +1737,8 @@ with tab_training:
                 st.markdown(f"**Setup:** {ex['setup']}")
                 st.markdown(f"**Execution:** {ex['execution']}")
                 st.markdown(f"**Bracing:** {ex['bracing']}")
+                if ex_name in BREATHING:
+                    st.markdown(f"**🫁 Breathing:** {BREATHING[ex_name]}")
                 st.markdown(f"**Where you feel it:** {ex['feel']}")
                 if ex['notes']:
                     st.warning(f"{ex['notes']}")
