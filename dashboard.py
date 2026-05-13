@@ -1343,18 +1343,18 @@ with tab_training:
     # --- Weekly Template ---
     st.markdown("### Weekly Template")
     week_template = {
-        "Tuesday": "Upper A — Horizontal Push/Pull",
-        "Wednesday": "Conditioning A — Zone 2 + Corrective",
-        "Thursday": "Lower A — Quad-Dominant",
-        "Friday": "Upper B — Vertical Push/Pull",
-        "Saturday": "Lower B — Hip-Dominant + Conditioning Finisher",
+        "Monday": "Upper A — Horizontal Push/Pull",
+        "Tuesday": "Conditioning A — Zone 2 + Corrective",
+        "Wednesday": "Lower A — Quad-Dominant",
+        "Thursday": "Upper B — Vertical Push/Pull",
+        "Friday": "Lower B — Hip-Dominant + Conditioning Finisher",
+        "Saturday": "Light Work / Optional Conditioning",
         "Sunday": "REST / Active Recovery",
-        "Monday": "Light Conditioning or REST (flexible)",
     }
     cols_wk = st.columns(7)
-    day_names = ["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"]
-    day_types = ["Upper A", "Zone 2", "Lower A", "Upper B", "Lower B", "REST", "Flex"]
-    day_colors = ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#ef4444", "#6b7280", "#6b7280"]
+    day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    day_types = ["Upper A", "Zone 2", "Lower A", "Upper B", "Lower B", "Optional", "REST"]
+    day_colors = ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#ef4444", "#f59e0b", "#6b7280"]
     for i, (dn, dt, dc) in enumerate(zip(day_names, day_types, day_colors)):
         with cols_wk[i]:
             st.markdown(f"<div style='text-align:center;padding:8px;border-radius:8px;background:{dc}20;border:1px solid {dc}'><b>{dn}</b><br><small>{dt}</small></div>", unsafe_allow_html=True)
@@ -1432,20 +1432,20 @@ with tab_training:
             "notes": "If right shoulder pinches at bottom, stop 1 inch above chest."
         },
         "Barbell Bent-Over Row": {
-            "sets": "3x10", "load": "75 lbs (bar+15s)", "rest": "90s", "tempo": "2-1-2-0",
+            "sets": "3x10", "load": "65 lbs (bar+10s)", "rest": "90s", "tempo": "2-1-2-0",
             "setup": "Stand feet hip width, soft knee bend. Hinge at hips until torso is 45 degrees to floor. Arms hang straight, grip just outside knees. Head neutral — look at floor 6 feet ahead.",
             "execution": "Pull bar to lower ribs by driving elbows BACK (not up). Squeeze shoulder blades 1s at top. Lower slowly. Bar travels in a straight line.",
             "bracing": "CRITICAL for lower back. Full brace before each rep. Maintain neutral spine — no rounding. If back rounds, weight is too heavy.",
             "feel": "Middle back (lats, rhomboids), rear shoulders. Lower back is a STABILIZER only. If it's the limiting factor, switch to landmine row.",
             "notes": "Lumbar alternative: Landmine row — same muscles, much less lumbar demand."
         },
-        "Weighted Push-Up": {
-            "sets": "3x12", "load": "10 lb vest (+2.5/week)", "rest": "60s", "tempo": "3-1-2-0",
-            "setup": "Wear vest. Hands shoulder-width on floor. Body in straight line head to heels. Squeeze glutes. Tighten core.",
+        "Push-Up": {
+            "sets": "3x12", "load": "Bodyweight (add vest when 3x15 is easy)", "rest": "60s", "tempo": "3-1-2-0",
+            "setup": "Hands shoulder-width on floor. Body in straight line head to heels. Squeeze glutes. Tighten core.",
             "execution": "Lower chest to floor in 3s. Touch gently. Pause 1s. Press up in 2s. At the TOP, push extra (protract) so upper back rounds slightly.",
             "bracing": "Full core brace entire time. Body stays rigid like a plank.",
             "feel": "Chest, triceps, front shoulders. At top with protraction, feel muscles on side of ribcage (serratus anterior) — that's your scapular winging fix.",
-            "notes": "Protraction at top is the key corrective component."
+            "notes": "Protraction at top is the key corrective component. When 3x15 bodyweight feels easy, add 10 lb vest."
         },
         "Landmine Row (single arm)": {
             "sets": "3x10/arm", "load": "Bar only or bar+10", "rest": "60s", "tempo": "2-1-2-0",
@@ -1453,7 +1453,7 @@ with tab_training:
             "execution": "Row bar to hip by driving elbow back. Squeeze lat at top. Lower slowly. Keep torso still — don't rotate.",
             "bracing": "Light brace. Hinge from hips, not lower back.",
             "feel": "Lat (side of back), rear shoulder. Much less lower back stress than bent-over row.",
-            "notes": "Your lumbar-safe rowing pattern."
+            "notes": "Your lumbar-safe rowing pattern. Add a 10 lb plate when bar only feels comfortable."
         },
         "Dips (Matador)": {
             "sets": "3x5-6", "load": "Bodyweight", "rest": "60s", "tempo": "2-1-2-0",
@@ -1628,7 +1628,7 @@ with tab_training:
             "setup": "Feet wide (1.5x shoulder width), toes out 30-45 degrees. Bar on back, high bar position.",
             "execution": "Squat straight down between legs. Knees track over toes. Torso very upright. Descend to parallel.",
             "bracing": "Standard brace. Exhale on the way up.",
-            "feel": "Inner thighs (adductors), glutes, quads. Different stimulus from Thursday front squat.",
+            "feel": "Inner thighs (adductors), glutes, quads. Different stimulus from Wednesday front squat.",
             "notes": ""
         },
         "Bird Dog": {
@@ -1643,17 +1643,17 @@ with tab_training:
 
     # --- Session Layouts ---
     SESSIONS = {
-        "Upper A — Tuesday": [
+        "Upper A — Monday": [
             ("A1", "Barbell Bench Press"),
             ("A2", "Barbell Bent-Over Row"),
-            ("B1", "Weighted Push-Up"),
+            ("B1", "Push-Up"),
             ("B2", "Landmine Row (single arm)"),
             ("C1", "Dips (Matador)"),
             ("C2", "Barbell Curl"),
             ("D1", "Pallof Press"),
             ("D2", "Dead Bug"),
         ],
-        "Lower A — Thursday": [
+        "Lower A — Wednesday": [
             ("A1", "Barbell Front Squat"),
             ("A2", "Slant Board Squat"),
             ("B1", "Barbell Reverse Lunge"),
@@ -1661,7 +1661,7 @@ with tab_training:
             ("C1", "Wall Sit"),
             ("C2", "Heel Slide + TA Engagement"),
         ],
-        "Upper B — Friday": [
+        "Upper B — Thursday": [
             ("A1", "Landmine Press"),
             ("A2", "Pull-Up (band-assisted)"),
             ("B1", "Landmine Lateral Raise"),
@@ -1671,7 +1671,7 @@ with tab_training:
             ("D1", "Side Plank"),
             ("D2", "Deep Neck Flexor Hold"),
         ],
-        "Lower B + Conditioning — Saturday": [
+        "Lower B + Conditioning — Friday": [
             ("A1", "Barbell RDL"),
             ("A2", "KB Swing"),
             ("B1", "Barbell Hip Thrust"),
@@ -1711,15 +1711,15 @@ with tab_training:
                     st.warning(f"{ex['notes']}")
                 st.markdown("---")
 
-            # Saturday conditioning finisher
-            if "Saturday" in session_name:
+            # Friday conditioning finisher
+            if "Friday" in session_name:
                 st.markdown("#### Conditioning Finisher")
                 st.markdown("**D1. KB Complex** — 4 rounds x 5 reps each: Swing → Clean → Front Squat (NO press — shoulder safe). Use 25lb or 35lb KB. Rest 90s between rounds.")
                 st.markdown("**D2. Weighted Vest Walk** — 3 x 2 min at 20 lbs vest (increase 2.5 lbs/week). Brisk pace, chest up, core braced.")
                 st.markdown("**D3. Diaphragmatic Breathing** — 3 min cooldown. 10 slow breaths. Parasympathetic shift.")
 
-    # Conditioning Wednesday
-    with st.expander("**Conditioning A — Wednesday (Zone 2 + Corrective)**", expanded=False):
+    # Conditioning Tuesday
+    with st.expander("**Conditioning A — Tuesday (Zone 2 + Corrective)**", expanded=False):
         st.markdown("""
 **A. Zone 2 Cardio — 30 min** (HR 125-145 bpm, nasal breathing)
 - Weighted vest brisk walk outdoors (20-25 lbs)
