@@ -1011,21 +1011,29 @@ with tab_checkin:
 
     # Upload new photos
     upload_cols = st.columns(3)
+    uploaded_files = {}
     for i, view in enumerate(["Front", "Side", "Back"]):
         with upload_cols[i]:
             has_photo = view in week_photos
             label = f"{'Replace' if has_photo else 'Upload'} {view} photo"
             uploaded = st.file_uploader(label, type=["jpg", "jpeg", "png"], key=f"photo_{week_name}_{view}")
             if uploaded:
-                with st.spinner(f"Uploading {view}..."):
-                    filename = f"{week_name}_{view}.jpg"
-                    file_id, link = upload_photo_to_drive(uploaded.getvalue(), filename, week_name)
-                    save_photo_meta(week_name, view, file_id)
-                    # Update checkin data photos
-                    checkin_data.setdefault("checkins", {}).setdefault(week_name, {}).setdefault("photos", {})[view] = True
-                    save_checkin_data(checkin_data)
-                st.success(f"{view} photo uploaded!")
-                st.rerun()
+                uploaded_files[view] = uploaded
+
+    if uploaded_files:
+        if st.button("📸 Save Photos", type="primary", use_container_width=True):
+            for view, uploaded in uploaded_files.items():
+                try:
+                    with st.spinner(f"Uploading {view}..."):
+                        filename = f"{week_name}_{view}.jpg"
+                        file_id, link = upload_photo_to_drive(uploaded.getvalue(), filename, week_name)
+                        save_photo_meta(week_name, view, file_id)
+                        checkin_data.setdefault("checkins", {}).setdefault(week_name, {}).setdefault("photos", {})[view] = True
+                    st.success(f"{view} photo uploaded!")
+                except Exception as e:
+                    st.error(f"Error uploading {view}: {e}")
+            save_checkin_data(checkin_data)
+            st.rerun()
 
     if checkin_data.get("checkins"):
         st.divider()
