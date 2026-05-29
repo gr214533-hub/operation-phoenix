@@ -1561,13 +1561,13 @@ with tab_training:
             "feel": "Lats (sides of back), biceps, forearms. If only arms, focus on shoulder blade cue.",
             "notes": "Progression: Wk1-2: 75-120lb band, 3x6-8 | Wk3-4: 50-75lb band, 3x5-6 | Wk5-6: 15-35lb band, 3x4-5 | Wk7-8: No band, 3x3-5. Track band + reps every session."
         },
-        "Landmine Lateral Raise": {
-            "sets": "3x10/arm", "load": "Bar only", "rest": "60s", "tempo": "2-1-2-0",
-            "setup": "Stand at END of barbell (perpendicular), fat end at hip. Grab end with nearest arm.",
-            "execution": "Straight arm, raise bar end out to side until arm parallel to floor. Lower slowly.",
-            "bracing": "Light brace. Don't lean away.",
-            "feel": "Side of shoulder (medial deltoid).",
-            "notes": ""
+        "DB Lateral Raise": {
+            "sets": "3x12", "load": "5 lb DBs", "rest": "60s", "tempo": "2-1-2-0",
+            "setup": "Stand tall, feet hip width. Hold 5 lb DBs at sides, palms facing in. Slight bend in elbows (and keep that angle locked throughout).",
+            "execution": "Raise both arms out to sides until hands reach shoulder height — no higher. Lead with your ELBOWS, not your hands (imagine pouring a pitcher of water). Lower slowly in 2s. Don't swing or shrug.",
+            "bracing": "Light core brace. Shoulders stay DOWN — if traps shrug up, the weight is too heavy.",
+            "feel": "Side of shoulder (medial deltoid). If you feel upper traps or front shoulder, lower the weight or focus on leading with elbows.",
+            "notes": "Progress: 5 lbs → 8 lbs → 10 lbs. Only go up when 3x15 is clean with no shrugging."
         },
         "Band Face Pull": {
             "sets": "3x15", "load": "Light band (15-35 lb)", "rest": "60s", "tempo": "2-2-2-0",
@@ -1669,7 +1669,7 @@ with tab_training:
         "Heel Slide + TA Engagement": "Draw navel toward spine (TA engaged — stays engaged entire time). INHALE at start. EXHALE slowly as you slide one heel out. INHALE as you slide it back in. TA never releases between reps.",
         "Landmine Press": "INHALE with bar at shoulder. Brace core HARD (single arm wants to rotate you). EXHALE through teeth as you press up. INHALE as you lower to shoulder. Re-brace each rep.",
         "Pull-Up (band-assisted)": "INHALE at dead hang (arms fully extended). Pull shoulders down and back. EXHALE through teeth as you pull up (chin over bar). INHALE as you lower slowly (3s) back to dead hang. Core stays engaged to prevent swinging.",
-        "Landmine Lateral Raise": "INHALE with arm at your side. EXHALE through teeth as you raise the bar out to the side. INHALE as you lower slowly. Light brace throughout.",
+        "DB Lateral Raise": "INHALE with arms at your sides. EXHALE through teeth as you raise both arms out to shoulder height. INHALE as you lower slowly (2s). Light brace throughout. Shoulders stay DOWN — don't shrug.",
         "Band Face Pull": "INHALE with arms extended toward anchor. EXHALE through teeth as you pull toward your face and rotate fists outward. Hold 2s (shallow breaths). INHALE as you return to start.",
         "Close-Grip Bench Press": "Same as bench press: INHALE at the top (arms locked). Hold breath as you lower to sternum. EXHALE through teeth as you press up. Inhale at lockout → repeat.",
         "KB Curl": "INHALE at bottom (arm straight). EXHALE through teeth as you curl up. INHALE as you lower slowly. Light brace to prevent swaying.",
@@ -1705,7 +1705,7 @@ with tab_training:
         "Upper B — Thursday": [
             ("A1", "Landmine Press"),
             ("A2", "Pull-Up (band-assisted)"),
-            ("B1", "Landmine Lateral Raise"),
+            ("B1", "DB Lateral Raise"),
             ("B2", "Band Face Pull"),
             ("C1", "Close-Grip Bench Press"),
             ("C2", "KB Curl"),
