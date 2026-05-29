@@ -958,17 +958,19 @@ with tab_checkin:
         st.markdown("**Body Composition**")
         c1, c2 = st.columns(2)
         with c1:
-            weight = st.number_input("Weight (kg)", 50.0, 150.0, float(existing.get("weight", 82.0)), 0.1)
+            _w = existing.get("weight")
+            weight = st.number_input("Weight (kg)", 50.0, 150.0, float(_w) if _w not in (None, "", 0) else 82.0, 0.1)
         with c2:
-            body_fat = st.number_input("Body Fat % (DEXA)", 0.0, 50.0, float(existing.get("body_fat", 0.0)), 0.1)
+            _bf = existing.get("body_fat")
+            body_fat = st.number_input("Body Fat % (DEXA)", 0.0, 50.0, float(_bf) if _bf not in (None, "", 0) else 0.0, 0.1)
 
         st.markdown("**Measurements (cm)** - [See Measurement Guide tab for instructions]")
         measurements = {}
         cols = st.columns(4)
         for i, site in enumerate(MEASUREMENT_SITES):
             with cols[i % 4]:
-                v = existing.get("measurements", {}).get(site, 0.0)
-                measurements[site] = st.number_input(site, 0.0, 200.0, float(v), 0.1, key=f"m_{site}")
+                v = existing.get("measurements", {}).get(site)
+                measurements[site] = st.number_input(site, 0.0, 200.0, float(v) if v not in (None, "", 0) else 0.0, 0.1, key=f"m_{site}")
 
         st.markdown("**How are you feeling? (1-10)**")
         subjective = {}
@@ -976,8 +978,8 @@ with tab_checkin:
         cols = st.columns(3)
         for i, item in enumerate(sub_items):
             with cols[i % 3]:
-                v = existing.get("subjective", {}).get(item, 5)
-                subjective[item] = st.slider(item, 1, 10, int(v), key=f"s_{item}")
+                v = existing.get("subjective", {}).get(item)
+                subjective[item] = st.slider(item, 1, 10, int(v) if v not in (None, "", 0) else 5, key=f"s_{item}")
 
         notes = st.text_area("Notes", existing.get("notes", ""), key="notes")
 
