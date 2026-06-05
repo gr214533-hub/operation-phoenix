@@ -1434,28 +1434,28 @@ with tab_training:
     # --- Exercise Database ---
     EXERCISES = {
         "Barbell Bench Press": {
-            "sets": "3x10", "load": "75 lbs (bar+15s)", "rest": "90s", "tempo": "3-1-2-0",
+            "sets": "8×5 clusters (Ph1) → 10×4 (Ph2) → 12×3 (Ph3)", "load": "Ph1: 80 lbs | Ph2: 95 lbs | Ph3: 100 lbs", "rest": "30–45s between cluster sets, 3 min between exercises", "tempo": "3-1-2-0",
             "setup": "Lie on bench, eyes under bar. Feet flat on floor. Pinch shoulder blades together and push them down into the bench (imagine putting them in your back pockets). Grip slightly wider than shoulder width. Unrack.",
-            "execution": "Lower bar to mid-chest (nipple line) in 3 seconds. Touch chest gently (don't bounce). Pause 1s. Press up in 2s. Lock arms without flaring elbows.",
+            "execution": "Lower bar to mid-chest (nipple line) in 3 seconds. Touch chest gently (don't bounce). Pause 1s. Press up in 2s. Lock arms. On cluster sets: complete 5 reps, re-rack, rest 30–45s, repeat for total cluster count.",
             "bracing": "Breathe in at the top. Brace core. Exhale through teeth as you press up. Re-breathe at lockout.",
             "feel": "Chest (pecs), front shoulders, triceps. If only shoulders, widen grip or retract scapulae more.",
-            "notes": "If right shoulder pinches at bottom, stop 1 inch above chest."
+            "notes": "T1 CLUSTER LIFT — Power Monday. Phase loads: Ph1 Wk1–3: 80 lbs (bar+2x15+2x2.5). Ph2 Wk4–6: 95 lbs (bar+2x25). Ph3 Wk7–8: 100 lbs (bar+2x25+2x2.5). Load is FIXED per phase — progress via completing all cluster sets cleanly, not by adding weight mid-phase. Week 1: if 80 feels too easy, that's normal — the cumulative volume across 8 sets is the stimulus."
         },
         "Barbell Bent-Over Row": {
-            "sets": "3x10", "load": "65 lbs (bar+10s)", "rest": "90s", "tempo": "2-1-2-0",
+            "sets": "8×5 clusters (Ph1) → 10×4 (Ph2) → 12×3 (Ph3)", "load": "Ph1: 65 lbs | Ph2: 75 lbs | Ph3: 80 lbs", "rest": "30–45s between cluster sets, 3 min between exercises", "tempo": "2-1-2-0",
             "setup": "Stand feet hip width, soft knee bend. Hinge at hips until torso is 45 degrees to floor. Arms hang straight, grip just outside knees. Head neutral — look at floor 6 feet ahead.",
-            "execution": "Pull bar to lower ribs by driving elbows BACK (not up). Squeeze shoulder blades 1s at top. Lower slowly. Bar travels in a straight line.",
+            "execution": "Pull bar to lower ribs by driving elbows BACK (not up). Squeeze shoulder blades 1s at top. Lower slowly. Bar travels in a straight line. On clusters: 5 reps, rest 30–45s, repeat.",
             "bracing": "CRITICAL for lower back. Full brace before each rep. Maintain neutral spine — no rounding. If back rounds, weight is too heavy.",
             "feel": "Middle back (lats, rhomboids), rear shoulders. Lower back is a STABILIZER only. If it's the limiting factor, switch to landmine row.",
-            "notes": "Lumbar alternative: Landmine row — same muscles, much less lumbar demand."
+            "notes": "T1 CLUSTER LIFT — Power Monday. Phase loads: Ph1 Wk1–3: 65 lbs (bar+2x10). Ph2 Wk4–6: 75 lbs (bar+2x15). Ph3 Wk7–8: 80 lbs (bar+2x15+2x2.5). Paired with Bench Press on rest periods — while bench rests, row, and vice versa. Lumbar alternative: Landmine row."
         },
-        "Push-Up": {
-            "sets": "3x12", "load": "Bodyweight (add vest when 3x15 is easy)", "rest": "60s", "tempo": "3-1-2-0",
-            "setup": "Hands shoulder-width on floor. Body in straight line head to heels. Squeeze glutes. Tighten core.",
-            "execution": "Lower chest to floor in 3s. Touch gently. Pause 1s. Press up in 2s. At the TOP, push extra (protract) so upper back rounds slightly.",
-            "bracing": "Full core brace entire time. Body stays rigid like a plank.",
-            "feel": "Chest, triceps, front shoulders. At top with protraction, feel muscles on side of ribcage (serratus anterior) — that's your scapular winging fix.",
-            "notes": "Protraction at top is the key corrective component. When 3x15 bodyweight feels easy, add 10 lb vest."
+        "Barbell Incline Press": {
+            "sets": "3x10-12", "load": "75 lbs (bar+2x15s) — start, double progression", "rest": "75s", "tempo": "3-1-2-0",
+            "setup": "Bench at 30-45 degree incline. Set bar in rack at incline height — or clean it to shoulders. Grip slightly wider than shoulder width. Shoulder blades pinched and pushed into bench. Feet flat on floor.",
+            "execution": "Lower bar to upper chest (below collarbones) in 3s. Touch lightly. Pause 1s. Press up in 2s. Bar path travels very slightly back toward the rack at the top.",
+            "bracing": "Breathe in at top. Brace core. Exhale through teeth pressing up. Re-breathe at lockout.",
+            "feel": "Upper chest (clavicular pec head), front shoulders. Upper chest is the most visible part of the chest — this builds the aesthetic 'shelf'. If only shoulders, retract scapulae harder before pressing.",
+            "notes": "Upper chest hits far better at this angle than flat bench alone. Starting load: 65 lbs (bar+10s). Progress same as flat bench: add reps → slow tempo → add set → jump weight (+10 lbs)."
         },
         "Landmine Row (single arm)": {
             "sets": "3x10/arm", "load": "Bar only or bar+10", "rest": "60s", "tempo": "2-1-2-0",
@@ -1498,7 +1498,7 @@ with tab_training:
             "notes": "Primary diastasis recti rehab exercise."
         },
         "Barbell Front Squat": {
-            "sets": "3x10", "load": "95 lbs (bar+25s)", "rest": "90s", "tempo": "3-1-2-0",
+            "sets": "1x5 @ 115 lbs (test set), then 2x6-8 @ 115 lbs", "load": "115 lbs (bar+2x35s)", "rest": "2 min", "tempo": "3-1-2-0",
             "setup": "Bar on FRONT of shoulders, across collarbones and front delts. Cross-arm grip recommended (arms crossed, hands on bar, elbows HIGH). Feet shoulder width, toes out 15-20 degrees.",
             "execution": "Squat by sitting BETWEEN legs (not back). Keep elbows HIGH — if they drop, bar rolls forward. Descend to parallel (hip crease level with knee top). Use box behind as depth check. Drive up through full foot.",
             "bracing": "Big breath at top. Full 360 degree brace. Exhale through teeth driving up. Re-breathe at top. NEVER let core go slack at bottom.",
@@ -1593,6 +1593,22 @@ with tab_training:
             "feel": "Biceps and forearm (extra grip demand from KB offset center of gravity).",
             "notes": ""
         },
+        "KB Hammer Curl": {
+            "sets": "3x12", "load": "20-25 lb KB", "rest": "60s", "tempo": "2-1-2-0",
+            "setup": "Hold one KB by the BELL (the round part), not the handle — both hands grip the sides of the bell, thumbs up, palms facing each other. This is the neutral 'hammer' grip. Stand tall, elbows pinned to sides.",
+            "execution": "Curl the KB up keeping palms facing each other the entire way. Squeeze at top. Lower slowly. Elbows don't move forward.",
+            "bracing": "Light core brace. No swinging.",
+            "feel": "Brachialis (muscle UNDER the bicep that pushes it up) and brachioradialis (outer forearm). Hammer grip adds forearm and arm width that barbell curls miss. The brachialis is what gives arms that thick, full look from the side.",
+            "notes": "This + Barbell Curl = complete arm development. Barbell targets biceps peak, KB Hammer targets arm width and thickness. Grip the BELL not the handle."
+        },
+        "Band Tricep Pushdown": {
+            "sets": "3x12-15", "load": "Medium band (35-50 lb)", "rest": "60s", "tempo": "2-1-2-0",
+            "setup": "Anchor band at top of rack or over pull-up bar. Face the anchor. Grip band with both hands, palms down, elbows at sides at 90 degrees.",
+            "execution": "Push band straight down by extending elbows. Lock out fully — squeeze triceps hard at the bottom for 1s. Return to 90 degrees only — don't let elbows drift forward. Elbows stay glued to sides.",
+            "bracing": "Light core brace. Slight forward lean is OK (10-15 degrees). Shoulders stay down.",
+            "feel": "Triceps (all three heads, primarily lateral head — the outer horseshoe). Triceps are 2/3 of upper arm size. This is your most direct arm-size exercise after dips.",
+            "notes": "Triceps respond very well to isolation. 12-15 reps + strong squeeze at lockout = maximum pump and muscle signal. Don't rush the reps."
+        },
         "Side Plank": {
             "sets": "2x25s/side", "load": "Bodyweight", "rest": "45s", "tempo": "Hold",
             "setup": "On elbow, body straight, feet stacked (or top foot in front). Hips off floor.",
@@ -1610,7 +1626,7 @@ with tab_training:
             "notes": "Cervicogenic migraine rehab. Deep neck flexor weakness is a primary contributor to migraines."
         },
         "Barbell RDL": {
-            "sets": "3x10", "load": "95 lbs (bar+25s)", "rest": "2 min", "tempo": "3-1-2-0",
+            "sets": "3x10-12 (double progression — start 95 lbs)", "load": "95 lbs (bar+2x25s)", "rest": "2 min", "tempo": "3-1-2-0",
             "setup": "Stand feet hip width, bar in front of thighs. Grip just outside legs. Soft knee bend (15-20 degrees — knees stay at this angle, they don't move).",
             "execution": "Push HIPS BACK (like closing a car door with your butt). Bar slides down thighs, staying in contact. Go until strong hamstring stretch (mid-shin to below knee). STOP — don't round back. Drive hips FORWARD to stand. Lock hips, squeeze glutes.",
             "bracing": "MOST BRACING-CRITICAL LIFT. Full 360 degree brace. Maintain neutral spine — imagine broomstick touching head, upper back, tailbone. All three stay in contact. Exhale through teeth standing up.",
@@ -1626,20 +1642,20 @@ with tab_training:
             "notes": "Use 25lb KB if 35 is too heavy for proper form."
         },
         "Barbell Hip Thrust": {
-            "sets": "3x10", "load": "95 lbs (bar+25s)", "rest": "90s", "tempo": "2-2-2-0",
+            "sets": "4x10-12 (double progression — start 95 lbs)", "load": "95 lbs (bar+2x25s)", "rest": "90s", "tempo": "2-2-2-0",
             "setup": "Sit on floor, back against bench at mid-scapula. Bar across hip crease (use balance pad as bar pad). Feet flat, shoulder width, 18 inches from butt. Toes slightly out.",
             "execution": "Drive through heels to extend hips. At top: torso parallel to floor, shins vertical. SQUEEZE GLUTES HARD — hold 2s. Lower slowly. Don't hyperextend lower back — tuck tailbone slightly (posterior pelvic tilt).",
             "bracing": "Light brace. Exhale driving up.",
             "feel": "GLUTES. If hamstrings, bring feet closer. If lower back, focus on tailbone tuck.",
             "notes": "Hernia-friendly (you're on your back). Progress weight fast — glutes can handle more than you think."
         },
-        "Barbell Sumo Squat": {
-            "sets": "3x10", "load": "75 lbs (bar+15s)", "rest": "60s", "tempo": "2-1-2-0",
-            "setup": "Feet wide (1.5x shoulder width), toes out 30-45 degrees. Bar on back, high bar position.",
-            "execution": "Squat straight down between legs. Knees track over toes. Torso very upright. Descend to parallel.",
-            "bracing": "Standard brace. Exhale on the way up.",
-            "feel": "Inner thighs (adductors), glutes, quads. Different stimulus from Wednesday front squat.",
-            "notes": ""
+        "Band Glute Kickback": {
+            "sets": "3x15/leg", "load": "Medium loop band around ankles", "rest": "45s", "tempo": "2-2-2-0",
+            "setup": "Anchor loop band to rack post low or use ankle strap attachment on cable. Face the anchor. Hold rack for balance. Slight forward lean at hips (15-20 degrees). Plant one foot, kick back with the other.",
+            "execution": "Drive the banded leg STRAIGHT BACK — think heel to ceiling. At full extension, squeeze glute HARD for 2 full seconds. Lower slowly (don't let band snap leg forward). Keep hips square — don't rotate. Small range of motion > swinging.",
+            "bracing": "Light core brace. Hips stay level — no tilting to the side.",
+            "feel": "Glute max, the large outer/upper butt muscle. This is the isolation move that sculpts glute shape. You should feel NOTHING in your lower back. If you do, reduce range of motion.",
+            "notes": "Glute max is the #1 aesthetic muscle for the glutes. Hip thrust builds overall size. Kickback sculpts shape. Do these slow — the squeeze is everything."
         },
         "Bird Dog": {
             "sets": "3x8/side", "load": "Bodyweight", "rest": "45s", "tempo": "3-2-3-0",
@@ -1648,6 +1664,30 @@ with tab_training:
             "bracing": "Core engaged, spine neutral.",
             "feel": "Deep core stabilizers. Anti-extension challenge.",
             "notes": "McGill Big 3 staple."
+        },
+        "Barbell Back Squat": {
+            "sets": "8×5 clusters (Ph1) → 10×4 (Ph2) → 12×3 (Ph3)", "load": "Ph1: 95 lbs | Ph2: 115 lbs | Ph3: 120 lbs", "rest": "60s between cluster sets, 3 min between exercises", "tempo": "3-1-2-0",
+            "setup": "Bar on upper traps (low-bar) or upper back (high-bar). Use squat pad if needed. Feet shoulder-width, toes out 20-30 degrees. Brace before unracking. Step back — one foot, then the other. Set stance.",
+            "execution": "Break at hips AND knees simultaneously — sit BETWEEN legs, not back. Knees track over toes the entire descent. Hit parallel (hip crease at or below knee cap). Drive UP through the full foot — push the floor away. Elbows slightly forward to keep torso upright. Lockout at top, squeeze glutes.",
+            "bracing": "BIG breath at top. Fill belly, sides, lower back. Brace 360 degrees. HOLD BREATH through the descent AND out of the hole. Exhale through clenched teeth driving up. Re-breathe fully at lockout before next rep. NEVER lose brace at the bottom — that's when injury happens.",
+            "feel": "Quads, glutes, adductors (inner thigh). Upper back works hard as a shelf. Lower back should be isometrically stable, not doing the work.",
+            "notes": "T1 CLUSTER LIFT — Power Wednesday. Phase loads: Ph1: 95 lbs (bar+25s). Ph2: 115 lbs (bar+35s). Ph3: 120 lbs (bar+35s+2x2.5). WEEK 1: Start conservatively at 95 lbs. If it moves fast and clean, that's your Ph1 weight. If it grinds, drop to 75 or 85. Knees tracking over toes is correct — do NOT push knees inward. Lower back note (L5-S1): belt recommended at Ph2+. If lower back aches after, check depth (don't go below parallel until more experienced)."
+        },
+        "Conventional Deadlift": {
+            "sets": "6×4 clusters (Ph1) → 8×4 (Ph2) → 10×3 (Ph3)", "load": "Ph1: 135 lbs | Ph2: 155 lbs | Ph3: 165 lbs", "rest": "60s between cluster sets, 4 min between exercises", "tempo": "2-1-2-0 (controlled, not slow)",
+            "setup": "Feet hip-width. Bar over mid-foot (1 inch from shins). Hinge down and grip just outside legs (double overhand). Push hips back until shins contact bar. Chest up, shoulders slightly in front of bar. Arms vertical. Take the slack out of the bar by pulling UPWARD before the weight leaves the floor — you'll hear a small click.",
+            "execution": "Drive the floor AWAY (think leg press, not 'pull up'). Hips and shoulders rise at the same rate — don't let hips shoot up first (that turns it into an ugly good morning). Bar stays in contact with shins/thighs the whole way up. Stand tall at lockout — hips FULLY extended, glutes squeezed. Lower under control: hinge at hips first, then bend knees when bar passes them. Reset fully between reps on clusters.",
+            "bracing": "MAXIMUM BRACE. Before pulling: big breath, 360 brace, squeeze lats INTO BACK POCKETS (lat engagement prevents lumbar rounding). Hold breath through entire pull. Exhale only at full lockout. This is the most compressive lift — brace harder than anything else.",
+            "feel": "Hamstrings and glutes driving the pull. Upper back (lats, traps) keeping the bar close. Quads involved in the initial drive. If lower back is the limiting factor, your hips are too low (you're trying to squat it) or too high (turning it into a back-dominant lift). Hip hinge is the Goldilocks position.",
+            "notes": "T1 CLUSTER LIFT — Power Wednesday. Phase: 6×4 in Ph1 (not 8×5 like upper lifts — deadlifts are more CNS-demanding). Ph2: 8×4. Ph3: 10×3. Phase loads: 135 (bar+45s) → 155 (bar+55s — use 45+5+2.5 each side) → 165 (bar+60s each side). WEEK 1: Test at 135 lbs. If fast, that's your weight. Lumbar note (L5-S1): if lower back is sore the next day, take an extra rest day before Wednesday next week. Wear a belt from Ph2 onwards. Never round the lower back."
+        },
+        "Barbell OHP (Standing)": {
+            "sets": "4x8-10 (double progression — start 65 lbs)", "load": "65 lbs (bar+2x10s)", "rest": "90s", "tempo": "2-1-2-0",
+            "setup": "Stand feet hip-width. Clean bar to shoulder height or take from rack at shoulder level. Grip just outside shoulder width. Bar rests on front delts/collarbones. Elbows slightly in front of bar (not pointing straight down). Brace hard before every rep.",
+            "execution": "Press bar STRAIGHT UP — your head moves BACK slightly to make room, then returns under the bar at lockout (the bar finishes directly over the ears/base of skull). At lockout: arms fully locked, shoulders shrugged up slightly (active lockout). Lower bar back to collarbones in 2s. Do NOT press at an angle forward — bar path is vertical.",
+            "bracing": "This is a standing lift — brace is everything. Big breath. 360 brace. Squeeze glutes to prevent lumbar hyperextension. Exhale through teeth pressing up. Inhale at shoulder. Re-brace each rep. If lower back arches noticeably, brace harder or reduce weight.",
+            "feel": "Front and lateral deltoids (the entire shoulder), upper chest, triceps. Upper traps at lockout. This builds shoulder width AND creates the appearance of broader shoulders from the front.",
+            "notes": "T1 HYPERTROPHY — Upper Hypertrophy Thursday. Double progression: hit 4x10 on all 4 sets → add 5 lbs next session. Starting: 65 lbs (bar+10s). Progression: 65 → 70 → 75 → 80 lbs. Shoulder note: bar path is slightly forward on the way DOWN (bar clears the face) and then comes back to vertical. This is normal — don't fight it. If shoulder impingement, try a slightly wider grip or reduce range of motion slightly at the bottom."
         },
     }
 
@@ -1678,52 +1718,58 @@ with tab_training:
         "Barbell RDL": "MOST CRITICAL BREATHING. INHALE big at the top — biggest breath of any exercise. Fill everything. Brace as hard as you can. HOLD BREATH ENTIRELY as you push hips back and lower the bar. At the bottom (hamstring stretch) you're still holding. EXHALE through clenched teeth as you drive hips forward to stand. Lock hips, squeeze glutes → release air → fresh big inhale → re-brace. If you feel the brace failing, end the set.",
         "KB Swing": "UNIQUE RHYTHM. INHALE as you hike the KB back between your legs. EXHALE sharply — a forceful 'HAH!' out of your mouth — as your hips snap forward. This is the one exercise where you exhale through your mouth with force because the movement is explosive. It becomes rhythmic: hike back (inhale) → hip snap (HAH!) → repeat.",
         "Barbell Hip Thrust": "INHALE at the bottom (hips low). Light brace. EXHALE through teeth as you drive hips up. At the top, squeeze glutes 2s — take small breaths during the hold. Lower slowly → inhale at bottom → repeat.",
-        "Barbell Sumo Squat": "INHALE at the top (standing). Standard brace. Hold breath as you squat down. EXHALE through teeth on the way up. Inhale at top → repeat.",
         "Bird Dog": "INHALE in starting position (hands and knees). EXHALE slowly as you extend opposite arm and leg. Hold 2s at top — small breath. INHALE as you return. Core stays engaged throughout.",
+        "Barbell Incline Press": "INHALE at the top (arms extended). Brace core. Hold breath as you lower bar to upper chest (3s). EXHALE through teeth as you press up. Re-breathe at lockout.",
+        "KB Hammer Curl": "INHALE at the bottom (arms straight). EXHALE through teeth as you curl up. INHALE as you lower slowly. Light brace throughout — no swinging.",
+        "Band Tricep Pushdown": "INHALE before rep with elbows at 90 degrees. EXHALE through teeth as you push band down and lock out. Hold the lockout 1s — take a tiny breath. Return to 90 degrees → fresh inhale → push again.",
+        "Band Glute Kickback": "BREATHE NORMALLY on the plant leg. EXHALE through teeth as you kick back and squeeze at the top. The exhale helps you squeeze harder. INHALE as you return leg. Slow, controlled — this is isolation work, not cardio.",
+        "Barbell Back Squat": "INHALE big at the top (standing, bar on back). Fill belly, sides, and lower back — biggest breath of any exercise. Brace 360 degrees HARD. HOLD BREATH as you descend — hold it at the bottom too. EXHALE forcefully through clenched teeth as you drive up out of the hole. Stand fully → release air → fresh deep inhale → re-brace → descend again. NEVER lose your brace at the bottom — that's the highest-risk moment. On cluster rest: breathe normally, then do the full brace sequence before each new cluster.",
+        "Conventional Deadlift": "MAXIMUM BRACE PROTOCOL. Stand over bar. INHALE big — biggest possible breath. Brace 360 degrees as hard as you can — imagine someone is about to punch you in the gut AND in the lower back simultaneously. HOLD BREATH ENTIRELY through the whole pull — from liftoff through full lockout. EXHALE only when fully standing and locked out. Lower back to floor → RE-BREATHE COMPLETELY before the next rep. Never start a new rep without a full reset breath and brace. If you feel your brace failing mid-rep, don't grind — it's better to miss the lift.",
+        "Barbell OHP (Standing)": "INHALE with bar at shoulders. BRACE (glutes too — prevents hyperextension). EXHALE through teeth pressing up. INHALE as you lower back to shoulders. Brace must be maintained every rep — this is a standing lift and the lower back is exposed. If you feel lower back engaging to 'lean into' the press, your brace failed — reduce weight.",
     }
 
     # --- Session Layouts ---
+    # PHAT × Cluster Hybrid | Mon/Wed = Power (T1 clusters) | Thu/Fri = Hypertrophy (double progression)
     SESSIONS = {
-        "Upper A — Monday": [
-            ("A1", "Barbell Bench Press"),
-            ("A2", "Barbell Bent-Over Row"),
-            ("B1", "Push-Up"),
-            ("B2", "Landmine Row (single arm)"),
-            ("C1", "Dips (Matador)"),
-            ("C2", "Barbell Curl"),
-            ("D1", "Pallof Press"),
-            ("D2", "Dead Bug"),
+        "Upper Power — Monday": [
+            ("T1a", "Barbell Bench Press"),
+            ("T1b", "Barbell Bent-Over Row"),
+            ("T2a", "Barbell Incline Press"),
+            ("T2b", "Landmine Row (single arm)"),
+            ("T3a", "DB Lateral Raise"),
+            ("T3b", "Band Tricep Pushdown"),
+            ("T3c", "Barbell Curl"),
+            ("C", "Dead Bug"),
         ],
-        "Lower A — Wednesday": [
-            ("A1", "Barbell Front Squat"),
-            ("A2", "Slant Board Squat"),
-            ("B1", "Barbell Reverse Lunge"),
-            ("B2", "Nordic Curl Eccentric"),
-            ("C1", "Wall Sit"),
-            ("C2", "Heel Slide + TA Engagement"),
+        "Lower Power — Wednesday": [
+            ("T1a", "Barbell Back Squat"),
+            ("T1b", "Conventional Deadlift"),
+            ("T2a", "Barbell RDL"),
+            ("T2b", "Nordic Curl Eccentric"),
+            ("T3", "Band Glute Kickback"),
+            ("C", "Bird Dog"),
         ],
-        "Upper B — Thursday": [
-            ("A1", "Landmine Press"),
-            ("A2", "Pull-Up (band-assisted)"),
-            ("B1", "DB Lateral Raise"),
-            ("B2", "Band Face Pull"),
-            ("C1", "Close-Grip Bench Press"),
-            ("C2", "KB Curl"),
-            ("D1", "Side Plank"),
-            ("D2", "Deep Neck Flexor Hold"),
+        "Upper Hypertrophy — Thursday": [
+            ("T1a", "Barbell OHP (Standing)"),
+            ("T1b", "Pull-Up (band-assisted)"),
+            ("T2a", "Close-Grip Bench Press"),
+            ("T2b", "Band Face Pull"),
+            ("T3a", "KB Hammer Curl"),
+            ("T3b", "Dips (Matador)"),
+            ("C", "Side Plank"),
         ],
-        "Lower B + Conditioning — Friday": [
-            ("A1", "Barbell RDL"),
-            ("A2", "KB Swing"),
-            ("B1", "Barbell Hip Thrust"),
-            ("B2", "Nordic Curl Eccentric"),
-            ("C1", "Barbell Sumo Squat"),
-            ("C2", "Bird Dog"),
+        "Lower Hypertrophy — Friday": [
+            ("T1a", "Barbell Hip Thrust"),
+            ("T1b", "Barbell Reverse Lunge"),
+            ("T2a", "Slant Board Squat"),
+            ("T2b", "KB Swing"),
+            ("T3", "Band Glute Kickback"),
+            ("C", "Heel Slide + TA Engagement"),
         ],
     }
 
     # --- Render Sessions ---
-    st.markdown("### Training Sessions (Phase 0 Loads)")
+    st.markdown("### PHAT × Cluster Hybrid Program — 8-Week Protocol")
     for session_name, exercises in SESSIONS.items():
         with st.expander(f"**{session_name}**", expanded=False):
             # Determine warm-up type
@@ -1787,16 +1833,15 @@ with tab_training:
 
     # --- Phase Progression Reference ---
     st.divider()
-    st.markdown("### Phase Progression")
+    st.markdown("### Phase Progression — PHAT × Cluster Hybrid")
     phase_df = pd.DataFrame([
-        {"Phase": "Phase 0", "Weeks": "1-2", "Primary Format": "3x8-12 straight sets", "Load": "Test x 0.85", "Intra-Rest": "N/A", "RPE": "6-7"},
-        {"Phase": "Phase 1", "Weeks": "3-4", "Primary Format": "8 reps x 5 clusters", "Load": "Test x 0.70", "Intra-Rest": "15s", "RPE": "7-8"},
-        {"Phase": "Phase 2", "Weeks": "5-6", "Primary Format": "10 reps x 4 clusters", "Load": "Test x 0.75", "Intra-Rest": "12s", "RPE": "8"},
-        {"Phase": "Phase 3", "Weeks": "7-8", "Primary Format": "12 reps x 3 clusters", "Load": "Test x 0.80", "Intra-Rest": "10s", "RPE": "8-9"},
+        {"Phase": "Phase 1", "Weeks": "1–3", "Cluster Format": "8×5", "Bench/Row Load": "80 / 65 lbs", "Squat/DL Load": "95 / 135 lbs", "Intra-Rest": "30–45s", "Tirz": "2.5mg"},
+        {"Phase": "Phase 2", "Weeks": "4–6", "Cluster Format": "10×4", "Bench/Row Load": "95 / 75 lbs", "Squat/DL Load": "115 / 155 lbs", "Intra-Rest": "30–45s", "Tirz": "5mg"},
+        {"Phase": "Phase 3", "Weeks": "7–8", "Cluster Format": "12×3", "Bench/Row Load": "100 / 80 lbs", "Squat/DL Load": "120 / 165 lbs", "Intra-Rest": "30–45s", "Tirz": "5mg"},
     ])
     st.dataframe(phase_df, use_container_width=True, hide_index=True)
 
-    st.caption("Phase 1-3: Only PRIMARY lifts (A exercises) use cluster format. Accessories stay as straight sets but add 1 set in Phase 2 (3→4 sets). Week 8: deload accessories to 2x10, keep primaries at cluster format (taper for DEXA).")
+    st.caption("Power days (Mon/Wed): T1 compound lifts use cluster sets — fixed load per phase. Hypertrophy days (Thu/Fri): straight sets with double progression (fill all reps → add 5 lbs). Tirz 5mg weeks 5–8: prioritize protein ≥160g/day. If recovery is impaired, drop 1–2 cluster sets rather than skipping the session.")
 
     # --- Load Tracker ---
     st.divider()

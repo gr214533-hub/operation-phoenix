@@ -1,7 +1,0 @@
-data/
-.streamlit/secrets.toml
-__pycache__/
-*.pyc
-.whoop_tokens.json
-.dashboard_data.json
-.checkin_data.json
