@@ -1769,43 +1769,76 @@ with tab_training:
     }
 
     # --- Render Sessions ---
-    st.markdown("### PHAT × Cluster Hybrid Program — 8-Week Protocol")
+    TIER_STYLE = {
+        "T1a": ("#c0392b", "T1 — Cluster"), "T1b": ("#c0392b", "T1 — Cluster"),
+        "T2a": ("#2471a3", "T2 — Strength"), "T2b": ("#2471a3", "T2 — Strength"),
+        "T3a": ("#1e8449", "T3 — Pump"), "T3b": ("#1e8449", "T3 — Pump"),
+        "T3c": ("#1e8449", "T3 — Pump"), "T3": ("#1e8449", "T3 — Pump"),
+        "C": ("#7d6608", "Core"), "Core": ("#7d6608", "Core"),
+    }
+
+    st.markdown("### PHAT × Cluster Hybrid — 8-Week Protocol")
+    st.caption("Mon/Wed = Power days (T1 cluster sets, fixed load per phase). Thu/Fri = Hypertrophy days (straight sets, double progression).")
+
     for session_name, exercises in SESSIONS.items():
         with st.expander(f"**{session_name}**", expanded=False):
-            # Determine warm-up type
             is_upper = "Upper" in session_name
-            if is_upper:
-                st.caption("Warm-up: CNS Block (Iron Neck + Breathing + Pull-Aparts) → Shoulder ER (8lb DB) 2x10/arm → Prone Y-Raise 1x8 → Empty Bar Groove 2x8")
+            is_power = "Power" in session_name
+
+            if is_power:
+                st.info("**Power day** — T1 lifts use cluster sets: complete the reps, re-rack, rest 30–45s, repeat for the full set count. Load is FIXED for the entire phase.")
             else:
-                st.caption("Warm-up: CNS Block (Iron Neck + Breathing + Pull-Aparts) → 90/90 Hip Switches 8/side → Slant Board Squat 1x10 → Band TKE 1x12/leg → Empty Bar Groove 2x8")
+                st.info("**Hypertrophy day** — All exercises use straight sets with double progression: hit the top of the rep range on all sets → add 5 lbs next session.")
+
+            if is_upper:
+                st.caption("Warm-up: Iron Neck 4-way → Diaphragmatic breathing 5 reps → Band pull-apart 15 reps → Shoulder ER 2×10/arm → Prone Y-Raise 1×8 → Empty bar groove 2×8")
+            else:
+                st.caption("Warm-up: Iron Neck 4-way → Diaphragmatic breathing 5 reps → Band pull-apart 15 reps → 90/90 hip switches 8/side → Slant board squat 1×10 → Band TKE 1×12/leg")
+
+            st.markdown("---")
 
             for order, ex_name in exercises:
                 ex = EXERCISES[ex_name]
-                st.markdown(f"#### {order}. {ex_name}")
-                col_l, col_r = st.columns([1, 1])
-                with col_l:
-                    st.markdown(f"**Sets/Reps:** {ex['sets']}")
-                    st.markdown(f"**Load:** {ex['load']}")
-                with col_r:
-                    st.markdown(f"**Rest:** {ex['rest']}")
-                    st.markdown(f"**Tempo:** {ex['tempo']}")
+                color, tier_label = TIER_STYLE.get(order, ("#7f8c8d", order))
 
+                # Exercise header with tier badge
+                st.markdown(f"""
+<div style="display:flex; align-items:center; gap:10px; margin-top:4px; margin-bottom:6px;">
+  <span style="background:{color}; color:white; padding:3px 10px; border-radius:4px; font-size:11px; font-weight:700; white-space:nowrap;">{tier_label}</span>
+  <span style="font-size:17px; font-weight:700;">{ex_name}</span>
+</div>
+""", unsafe_allow_html=True)
+
+                # Stats card — full width, no cramped columns
+                st.markdown(f"""
+<div style="background:#f4f6f7; border-left:4px solid {color}; padding:10px 16px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:14px; line-height:1.8;">
+  <b>Sets / Reps:</b>&nbsp; {ex['sets']}<br>
+  <b>Load:</b>&nbsp; {ex['load']}<br>
+  <b>Rest:</b>&nbsp; {ex['rest']} &nbsp;&nbsp;·&nbsp;&nbsp; <b>Tempo:</b>&nbsp; {ex['tempo']}
+</div>
+""", unsafe_allow_html=True)
+
+                # Detail fields
                 st.markdown(f"**Setup:** {ex['setup']}")
                 st.markdown(f"**Execution:** {ex['execution']}")
                 st.markdown(f"**Bracing:** {ex['bracing']}")
                 if ex_name in BREATHING:
-                    st.markdown(f"**🫁 Breathing:** {BREATHING[ex_name]}")
-                st.markdown(f"**Where you feel it:** {ex['feel']}")
+                    st.markdown(f"""
+<div style="background:#eaf4fb; border-left:3px solid #2471a3; padding:8px 14px; border-radius:0 4px 4px 0; margin:6px 0; font-size:13px;">
+  <b>Breathing:</b> {BREATHING[ex_name]}
+</div>
+""", unsafe_allow_html=True)
+                st.markdown(f"**Feel it:** {ex['feel']}")
                 if ex['notes']:
-                    st.warning(f"{ex['notes']}")
+                    st.warning(ex['notes'])
                 st.markdown("---")
 
             # Friday conditioning finisher
             if "Friday" in session_name:
                 st.markdown("#### Conditioning Finisher")
-                st.markdown("**D1. KB Complex** — 4 rounds x 5 reps each: Swing → Clean → Front Squat (NO press — shoulder safe). Use 25lb or 35lb KB. Rest 90s between rounds.")
-                st.markdown("**D2. Weighted Vest Walk** — 3 x 2 min at 20 lbs vest (increase 2.5 lbs/week). Brisk pace, chest up, core braced.")
-                st.markdown("**D3. Diaphragmatic Breathing** — 3 min cooldown. 10 slow breaths. Parasympathetic shift.")
+                st.markdown("**KB Complex** — 4 rounds × 5 reps: Swing → Clean → Front Squat (no press). 25–35 lb KB. Rest 90s between rounds.")
+                st.markdown("**Weighted Vest Walk** — 3 × 2 min at 20 lbs. Brisk pace, core braced.")
+                st.markdown("**Diaphragmatic Breathing** — 3 min cooldown. 10 slow breaths. Parasympathetic reset.")
 
     # Conditioning Tuesday
     with st.expander("**Conditioning A — Tuesday (Zone 2 + Corrective)**", expanded=False):
