@@ -1954,201 +1954,429 @@ with tab_training:
         st.markdown("**Cervicogenic Migraines**")
         st.markdown("- Iron Neck opens every session\n- Deep neck flexor holds\n- Front squat (no bar on traps)\n- No heavy shrugs")
 # ============================================================
-# TAB: NUTRITION PLAN
+# NUTRITION — FOOD DATABASE & HELPER FUNCTIONS
+# ============================================================
+
+FOODS = {
+    # PROTEINS (per 100g cooked unless noted)
+    "Chicken breast (cooked)":          {"p": 31,  "f": 3.6, "c": 0,   "kcal": 165, "cat": "protein", "unit": "g"},
+    "Chicken thigh skinless (cooked)":  {"p": 26,  "f": 9,   "c": 0,   "kcal": 185, "cat": "protein", "unit": "g"},
+    "Ground beef 93% lean (cooked)":    {"p": 28,  "f": 7,   "c": 0,   "kcal": 175, "cat": "protein", "unit": "g"},
+    "Ground turkey 99% lean (cooked)":  {"p": 29,  "f": 2,   "c": 0,   "kcal": 136, "cat": "protein", "unit": "g"},
+    "Pork tenderloin (cooked)":         {"p": 26,  "f": 3,   "c": 0,   "kcal": 143, "cat": "protein", "unit": "g"},
+    "Flank/skirt steak (cooked)":       {"p": 28,  "f": 8,   "c": 0,   "kcal": 185, "cat": "protein", "unit": "g"},
+    "Bison ground (cooked)":            {"p": 26,  "f": 7,   "c": 0,   "kcal": 168, "cat": "protein", "unit": "g"},
+    "Salmon fillet (cooked)":           {"p": 25,  "f": 13,  "c": 0,   "kcal": 208, "cat": "protein", "unit": "g"},
+    "Barramundi (cooked)":              {"p": 24,  "f": 2,   "c": 0,   "kcal": 118, "cat": "protein", "unit": "g"},
+    "Canned tuna in water":             {"p": 26,  "f": 1,   "c": 0,   "kcal": 116, "cat": "protein", "unit": "g"},
+    "Smoked salmon":                    {"p": 18,  "f": 4,   "c": 0,   "kcal": 117, "cat": "protein", "unit": "g"},
+    "Eggs whole (per 2 large)":         {"p": 12,  "f": 10,  "c": 1,   "kcal": 143, "cat": "protein", "unit": "portion (2 eggs)"},
+    "Egg whites liquid (100ml)":        {"p": 11,  "f": 0,   "c": 0.4, "kcal": 48,  "cat": "protein", "unit": "g"},
+    "Siggi's Icelandic yogurt (150g)":  {"p": 15,  "f": 4,   "c": 10,  "kcal": 130, "cat": "protein", "unit": "portion (150g cup)"},
+    "Cottage cheese (150g)":            {"p": 17,  "f": 3,   "c": 5,   "kcal": 115, "cat": "protein", "unit": "portion (150g)"},
+    "ISO100 Whey (1 scoop ~30g)":       {"p": 25,  "f": 1,   "c": 3,   "kcal": 120, "cat": "protein", "unit": "scoop"},
+    # CARBS (per 100g cooked unless noted)
+    "White rice (cooked)":              {"p": 2.5, "f": 0.3, "c": 28,  "kcal": 130, "cat": "carb",    "unit": "g"},
+    "Sweet potato cubed (roasted)":     {"p": 1.8, "f": 0.2, "c": 20,  "kcal": 86,  "cat": "carb",    "unit": "g"},
+    "Baby potato (boiled)":             {"p": 2,   "f": 0.1, "c": 17,  "kcal": 77,  "cat": "carb",    "unit": "g"},
+    "Lentils (cooked)":                 {"p": 9,   "f": 0.4, "c": 20,  "kcal": 116, "cat": "carb",    "unit": "g"},
+    "Quinoa (cooked)":                  {"p": 4,   "f": 2,   "c": 22,  "kcal": 120, "cat": "carb",    "unit": "g"},
+    "Oats rolled dry (40g)":            {"p": 5,   "f": 3,   "c": 27,  "kcal": 152, "cat": "carb",    "unit": "portion (40g)"},
+    "Banana (medium)":                  {"p": 1,   "f": 0,   "c": 23,  "kcal": 89,  "cat": "carb",    "unit": "piece"},
+    "Apple":                            {"p": 0.3, "f": 0.2, "c": 21,  "kcal": 81,  "cat": "carb",    "unit": "piece"},
+    # VEGETABLES & FATS (per 100g unless noted)
+    "Broccoli":                         {"p": 2.8, "f": 0.4, "c": 7,   "kcal": 34,  "cat": "veg",     "unit": "g"},
+    "Zucchini":                         {"p": 1.2, "f": 0.3, "c": 3,   "kcal": 17,  "cat": "veg",     "unit": "g"},
+    "Cauliflower":                      {"p": 1.9, "f": 0.3, "c": 5,   "kcal": 25,  "cat": "veg",     "unit": "g"},
+    "Green beans":                      {"p": 1.8, "f": 0.1, "c": 7,   "kcal": 31,  "cat": "veg",     "unit": "g"},
+    "Baby spinach":                     {"p": 2.9, "f": 0.4, "c": 3.6, "kcal": 23,  "cat": "veg",     "unit": "g"},
+    "Mushrooms cremini":                {"p": 2.5, "f": 0.1, "c": 3.3, "kcal": 22,  "cat": "veg",     "unit": "g"},
+    "Bell peppers":                     {"p": 1,   "f": 0.3, "c": 6,   "kcal": 31,  "cat": "veg",     "unit": "g"},
+    "Cherry tomatoes":                  {"p": 0.9, "f": 0.2, "c": 3.9, "kcal": 18,  "cat": "veg",     "unit": "g"},
+    "Cucumber":                         {"p": 0.7, "f": 0.1, "c": 3.6, "kcal": 15,  "cat": "veg",     "unit": "g"},
+    "Avocado (37g portion)":            {"p": 0.9, "f": 7,   "c": 3,   "kcal": 59,  "cat": "fat",     "unit": "portion (37g)"},
+    "Olive oil (1 tsp)":                {"p": 0,   "f": 4.5, "c": 0,   "kcal": 40,  "cat": "fat",     "unit": "tsp"},
+    "Avocado oil (1 tsp)":              {"p": 0,   "f": 4.5, "c": 0,   "kcal": 40,  "cat": "fat",     "unit": "tsp"},
+    # RECIPES (fixed macros per serving)
+    "Ground Beef Breakfast Power Bowl":      {"p": 52, "f": 22, "c": 4,  "kcal": 420, "cat": "recipe", "unit": "serving"},
+    "Cottage Cheese & Siggi's Savory Bowl":  {"p": 34, "f": 8,  "c": 12, "kcal": 255, "cat": "recipe", "unit": "serving"},
+    "Smoked Salmon & Avocado Plate":         {"p": 35, "f": 14, "c": 8,  "kcal": 295, "cat": "recipe", "unit": "serving"},
+    "Turkish-Spiced Chicken Breakfast Bowl": {"p": 65, "f": 18, "c": 10, "kcal": 455, "cat": "recipe", "unit": "serving"},
+    "Protein Smoothie Bowl":                 {"p": 48, "f": 6,  "c": 28, "kcal": 355, "cat": "recipe", "unit": "serving"},
+    "Korean Ground Turkey Bowl (no rice)":   {"p": 55, "f": 8,  "c": 10, "kcal": 335, "cat": "recipe", "unit": "serving"},
+    "Korean Ground Turkey Bowl (w/ rice)":   {"p": 58, "f": 8,  "c": 38, "kcal": 465, "cat": "recipe", "unit": "serving"},
+    "Mexican Picanha Bowl":                  {"p": 55, "f": 14, "c": 22, "kcal": 435, "cat": "recipe", "unit": "serving"},
+    "Peruvian Salmon Ceviche":               {"p": 45, "f": 14, "c": 2,  "kcal": 310, "cat": "recipe", "unit": "serving"},
+    "Pan-Seared Barramundi + Spinach":       {"p": 48, "f": 12, "c": 3,  "kcal": 310, "cat": "recipe", "unit": "serving"},
+    "Tuna Tartare with Avocado":             {"p": 46, "f": 18, "c": 6,  "kcal": 370, "cat": "recipe", "unit": "serving"},
+    "Asian Salmon with Bok Choy":            {"p": 48, "f": 20, "c": 8,  "kcal": 400, "cat": "recipe", "unit": "serving"},
+    "Greek Chicken & Cucumber Salad":        {"p": 50, "f": 18, "c": 8,  "kcal": 390, "cat": "recipe", "unit": "serving"},
+    "Classic Greek Salad + Chicken 180g":    {"p": 58, "f": 12, "c": 8,  "kcal": 370, "cat": "recipe", "unit": "serving"},
+    "ISO100 + Cottage Cheese Shake":         {"p": 42, "f": 4,  "c": 8,  "kcal": 235, "cat": "recipe", "unit": "serving"},
+}
+
+DAY_TYPE_TARGETS = {
+    "Training Day": {"kcal": 1700, "protein": 160, "carbs": 145, "fat": 53},
+    "4x4 Day":      {"kcal": 1800, "protein": 160, "carbs": 175, "fat": 53},
+    "Rest Day":     {"kcal": 1350, "protein": 160, "carbs": 65,  "fat": 52},
+}
+
+NUTRITION_LOG_HEADERS = ["date", "day_type", "meal", "food_item", "amount", "protein", "carbs", "fat", "kcal", "saved_at"]
+
+
+def load_nutrition_log():
+    """Load nutrition log from Google Sheets."""
+    try:
+        ss = get_spreadsheet()
+        ws = get_or_create_worksheet(ss, "nutrition_log", NUTRITION_LOG_HEADERS)
+        return ws.get_all_records()
+    except Exception as e:
+        st.warning(f"Could not load nutrition log: {e}")
+        return []
+
+
+def save_nutrition_entries(date_str, day_type, meal_log):
+    """Overwrite all rows for this date and save current meal log."""
+    try:
+        ss = get_spreadsheet()
+        ws = get_or_create_worksheet(ss, "nutrition_log", NUTRITION_LOG_HEADERS)
+        existing = ws.get_all_records()
+        saved_at = datetime.now().isoformat()
+        new_rows = [NUTRITION_LOG_HEADERS]
+        for row in existing:
+            if str(row.get("date", "")) != date_str:
+                new_rows.append([row.get(h, "") for h in NUTRITION_LOG_HEADERS])
+        for meal_name, entries in meal_log.items():
+            for entry in entries:
+                new_rows.append([
+                    date_str, day_type, meal_name, entry["food"],
+                    round(float(entry["amount"]), 2),
+                    round(float(entry["protein"]), 1),
+                    round(float(entry["carbs"]), 1),
+                    round(float(entry["fat"]), 1),
+                    round(float(entry["kcal"]), 1),
+                    saved_at,
+                ])
+        ws.clear()
+        ws.update("A1", new_rows)
+        ws.format("A1:J1", {"textFormat": {"bold": True}})
+        return True
+    except Exception as e:
+        st.error(f"Could not save nutrition log: {e}")
+        return False
+
+
+def calc_food_macros(food_name, amount):
+    """Calculate macros for a food given the amount."""
+    f = FOODS[food_name]
+    factor = (amount / 100.0) if f.get("unit", "g") == "g" else float(amount)
+    return {
+        "protein": round(f["p"] * factor, 1),
+        "fat":     round(f["f"] * factor, 1),
+        "carbs":   round(f["c"] * factor, 1),
+        "kcal":    round(f["kcal"] * factor, 1),
+    }
+
+
+# ============================================================
+# TAB: NUTRITION
 # ============================================================
 with tab_nutrition:
-    st.subheader("Nutrition Plan")
-    st.caption("Whoop-calibrated macros for body recomposition | 15% deficit from actual TDEE")
+    nutr_sub = st.tabs(["📅 Daily Tracker", "📚 Food Library", "📈 Trends"])
 
-    # --- Targets ---
-    st.markdown("### Daily Targets")
-    nut_cols = st.columns(5)
-    with nut_cols[0]:
-        st.metric("Calories", "1,799 kcal")
-    with nut_cols[1]:
-        st.metric("Protein", "180g (40%)")
-    with nut_cols[2]:
-        st.metric("Fat", "50g (25%)")
-    with nut_cols[3]:
-        st.metric("Carbs", "157g (35%)")
-    with nut_cols[4]:
-        st.metric("Deficit", "~317 kcal/day")
+    # ── SUB-TAB 1: DAILY TRACKER ──────────────────────────────
+    with nutr_sub[0]:
+        if "nutr_log" not in st.session_state:
+            st.session_state.nutr_log = {}
 
-    st.info("**Based on Whoop 6-month average TDEE of 2,116 kcal/day.** Reassess after Week 2 — structured training will likely increase TDEE. If Whoop average rises to 2,300+, bump intake to ~1,955 kcal/day.")
+        # Step 1: Date + Day Type
+        col_d, col_t = st.columns([1, 2])
+        with col_d:
+            sel_date = st.date_input("Date", value=date.today(), key="nutr_date_sel")
+        date_str = sel_date.isoformat()
+        weekday = sel_date.weekday()
+        if weekday == 2:
+            auto_day = "4x4 Day"
+        elif weekday in (0, 3, 4):
+            auto_day = "Training Day"
+        else:
+            auto_day = "Rest Day"
+        with col_t:
+            day_type_choices = ["Training Day", "4x4 Day", "Rest Day"]
+            day_type = st.radio(
+                "Day Type", day_type_choices,
+                index=day_type_choices.index(auto_day),
+                horizontal=True, key="nutr_day_type_radio",
+            )
 
-    # --- Meal Split ---
-    st.markdown("### Meal Split")
-    split_data = pd.DataFrame([
-        {"Meal": "Breakfast", "% of Total": "25%", "Calories": "~450 kcal", "Timing": "6-8 AM"},
-        {"Meal": "Lunch", "% of Total": "40%", "Calories": "~720 kcal", "Timing": "12-1 PM"},
-        {"Meal": "Dinner (light)", "% of Total": "20%", "Calories": "~360 kcal", "Timing": "6-7 PM"},
-        {"Meal": "Post-Workout Shake", "% of Total": "15%", "Calories": "~270 kcal", "Timing": "Post-training"},
-    ])
-    st.dataframe(split_data, use_container_width=True, hide_index=True)
-    st.caption("Rest days: drop the shake entirely (target ~1,529 kcal). Add ~50 kcal to lunch.")
+        targets = DAY_TYPE_TARGETS[day_type]
 
-    st.divider()
+        mc1, mc2, mc3, mc4 = st.columns(4)
+        mc1.metric("🔥 Calories", f"{targets['kcal']} kcal")
+        mc2.metric("🥩 Protein", f"{targets['protein']}g")
+        mc3.metric("🍚 Carbs", f"{targets['carbs']}g")
+        mc4.metric("🧈 Fat", f"{targets['fat']}g")
 
-    # --- Meal Guides ---
-    st.markdown("### Weighted Meal Guides (grams)")
-    st.caption("Weigh everything. These guides hit your macro targets when mixed and matched.")
+        if day_type == "Rest Day":
+            st.info("🛌 **Rest Day:** No starch, no white rice. Carbs from veg only. 160g protein — that never changes.")
+        elif day_type == "4x4 Day":
+            st.info("💪 **4x4 Day (heaviest cardio):** Highest carb day — white rice is on. Fuel the workout.")
+        else:
+            st.info("🏋️ **Training Day:** Moderate carbs (sweet potato / baby potato preferred). 160g protein non-negotiable.")
 
-    # Breakfast
-    with st.expander("Breakfast (~450 kcal) — 2 options", expanded=False):
-        st.markdown("""
-**Option A — Standard Day**
-| Food | Amount | Notes |
-|---|---|---|
-| Whole egg | 1 (50g) | |
-| Egg whites | 120g | |
-| Siggi's skyr (plain) | 150g | Mix collagen into this |
-| Mixed berries | 80g | Blueberries, strawberries, etc. |
-| Collagen peptides | 1 scoop | With Vitamin C for synthesis |
+        if date_str not in st.session_state.nutr_log:
+            st.session_state.nutr_log[date_str] = {
+                m: [] for m in ("Breakfast", "Lunch", "Afternoon Shake", "Dinner")
+            }
+        day_log = st.session_state.nutr_log[date_str]
 
-*Macros: ~40g P / 10g F / 28g C*
+        FOOD_DISPLAY = {
+            fn: (f"{fn} (recipe)" if fd["cat"] == "recipe"
+                 else f"{fn} (per 100g)" if fd.get("unit", "g") == "g"
+                 else f"{fn} (per {fd.get('unit', 'g')})")
+            for fn, fd in FOODS.items()
+        }
+        SORTED_FOODS = sorted(FOODS.keys(), key=lambda x: FOOD_DISPLAY[x])
 
-**Option B — Sausage Day**
-| Food | Amount | Notes |
-|---|---|---|
-| Whole egg | 1 (50g) | |
-| Egg whites | 80g | |
-| Chicken breakfast sausage | 1 link (~55g) | Look for <3g fat per link |
-| Siggi's skyr (plain) | 120g | |
-| Banana | 60g (half) | |
+        # Step 2: Meal sections
+        st.markdown("---")
+        MEAL_ICONS = {"Breakfast": "☕", "Lunch": "🥗", "Afternoon Shake": "🥤", "Dinner": "🍽️"}
 
-*Macros: ~38g P / 13g F / 25g C*
-""")
+        for meal_name in ("Breakfast", "Lunch", "Afternoon Shake", "Dinner"):
+            entries = day_log[meal_name]
+            m_kcal    = sum(e["kcal"]    for e in entries)
+            m_protein = sum(e["protein"] for e in entries)
+            m_carbs   = sum(e["carbs"]   for e in entries)
+            m_fat     = sum(e["fat"]     for e in entries)
 
-    # Lunch
-    with st.expander("Lunch (~720 kcal) — 4 options (office-friendly, reheatable)", expanded=False):
-        st.markdown("""
-**Option 1 — Ground Turkey + Rice**
-| Food | Amount |
-|---|---|
-| 93% lean ground turkey | 180g |
-| Cooked white rice | 150g |
-| Mixed vegetables | 150g |
-| Olive oil (cooking) | 5ml |
+            header_txt = f"{MEAL_ICONS[meal_name]} {meal_name}"
+            if entries:
+                header_txt += f"  —  {round(m_kcal)} kcal | P:{round(m_protein)}g C:{round(m_carbs)}g F:{round(m_fat)}g"
 
-*Macros: ~45g P / 10g F / 50g C*
+            with st.expander(header_txt, expanded=False):
+                if entries:
+                    for idx, entry in enumerate(entries):
+                        rc1, rc2, rc3 = st.columns([4, 3, 1])
+                        with rc1:
+                            st.markdown(f"**{entry['food']}** — {entry['amount_display']}")
+                        with rc2:
+                            st.caption(f"P:{round(entry['protein'])}g  C:{round(entry['carbs'])}g  F:{round(entry['fat'])}g  |  {round(entry['kcal'])} kcal")
+                        with rc3:
+                            if st.button("✕", key=f"rm_{date_str}_{meal_name}_{idx}"):
+                                day_log[meal_name].pop(idx)
+                                st.rerun()
+                    st.caption(f"**Meal total:** P:{round(m_protein)}g  C:{round(m_carbs)}g  F:{round(m_fat)}g  |  {round(m_kcal)} kcal")
+                    st.divider()
 
-**Option 2 — Ground Beef + Potatoes**
-| Food | Amount |
-|---|---|
-| 90% lean ground beef | 150g |
-| Potatoes (boiled/roasted) | 180g |
-| Mixed vegetables | 150g |
+                ac1, ac2, ac3 = st.columns([4, 2, 1])
+                with ac1:
+                    sel_food = st.selectbox(
+                        "Food", SORTED_FOODS,
+                        format_func=lambda fn: FOOD_DISPLAY[fn],
+                        key=f"food_sel_{meal_name}_{date_str}",
+                        label_visibility="collapsed",
+                    )
+                food_unit = FOODS[sel_food].get("unit", "g")
+                with ac2:
+                    if food_unit == "g":
+                        amt_label, amt_default, amt_step = "Amount (g)", 100.0, 10.0
+                    elif food_unit == "tsp":
+                        amt_label, amt_default, amt_step = "# tsps", 1.0, 0.5
+                    elif food_unit == "scoop":
+                        amt_label, amt_default, amt_step = "# scoops", 1.0, 1.0
+                    else:
+                        amt_label, amt_default, amt_step = "# servings", 1.0, 1.0
+                    amount_val = st.number_input(
+                        amt_label, min_value=0.0, max_value=2000.0,
+                        value=amt_default, step=amt_step,
+                        key=f"amt_{meal_name}_{date_str}",
+                        label_visibility="collapsed",
+                    )
+                with ac3:
+                    if st.button("＋ Add", key=f"add_{meal_name}_{date_str}", type="primary"):
+                        if amount_val > 0:
+                            macros = calc_food_macros(sel_food, amount_val)
+                            if food_unit == "g":
+                                disp = f"{round(amount_val)}g"
+                            elif food_unit == "tsp":
+                                disp = f"{amount_val} tsp"
+                            elif food_unit == "scoop":
+                                disp = f"{amount_val} scoop(s)"
+                            else:
+                                disp = f"{amount_val}× {food_unit}"
+                            day_log[meal_name].append({
+                                "food": sel_food, "amount": amount_val,
+                                "amount_display": disp, **macros,
+                            })
+                            st.rerun()
 
-*Macros: ~40g P / 14g F / 45g C*
+        # Step 3: Daily totals
+        st.divider()
+        st.markdown("### \U0001f4ca Daily Summary")
 
-**Option 3 — Shredded Chicken + Rice**
-| Food | Amount |
-|---|---|
-| Shredded chicken breast | 190g |
-| Cooked white rice | 150g |
-| Mixed vegetables | 150g |
-| Olive oil | 5ml |
+        total_kcal    = sum(e["kcal"]    for m in day_log.values() for e in m)
+        total_protein = sum(e["protein"] for m in day_log.values() for e in m)
+        total_carbs   = sum(e["carbs"]   for m in day_log.values() for e in m)
+        total_fat     = sum(e["fat"]     for m in day_log.values() for e in m)
 
-*Macros: ~46g P / 8g F / 48g C*
+        def _pct(current, target):
+            return min(float(current) / float(target), 1.0) if target > 0 else 0.0
 
-**Option 4 — Stew Meat + Potatoes**
-| Food | Amount |
-|---|---|
-| Lean stew meat (trimmed) | 160g |
-| Potatoes | 180g |
-| Mixed vegetables | 150g |
+        pb1, pb2, pb3, pb4 = st.columns(4)
+        with pb1:
+            st.markdown(f"**\U0001f525 Calories:** {round(total_kcal)} / {targets['kcal']} kcal")
+            st.progress(_pct(total_kcal, targets["kcal"]))
+        with pb2:
+            st.markdown(f"**\U0001f969 Protein:** {round(total_protein)} / {targets['protein']}g")
+            st.progress(_pct(total_protein, targets["protein"]))
+        with pb3:
+            st.markdown(f"**\U0001f35a Carbs:** {round(total_carbs)} / {targets['carbs']}g")
+            st.progress(_pct(total_carbs, targets["carbs"]))
+        with pb4:
+            st.markdown(f"**\U0001f9c8 Fat:** {round(total_fat)} / {targets['fat']}g")
+            st.progress(_pct(total_fat, targets["fat"]))
 
-*Macros: ~42g P / 12g F / 46g C*
-""")
+        sc1, sc2 = st.columns(2)
+        with sc1:
+            gap_p = targets["protein"] - total_protein
+            if gap_p <= 0:
+                st.success(f"✅ Protein on track ({round(total_protein)}g / {targets['protein']}g)")
+            else:
+                st.warning(f"⚠️ Need {round(gap_p)}g more protein today")
+        with sc2:
+            diff_k = total_kcal - targets["kcal"]
+            if diff_k > 150:
+                st.error(f"\U0001f534 Over by {round(diff_k)} kcal ({round(total_kcal)} / {targets['kcal']})")
+            elif diff_k > 50:
+                st.warning(f"\U0001f7e1 Approaching limit ({round(total_kcal)} / {targets['kcal']} kcal)")
+            else:
+                st.success(f"✅ Calories on track ({round(total_kcal)} / {targets['kcal']} kcal)")
 
-    # Dinner
-    with st.expander("Dinner (~360 kcal) — 4 options (lighter for peptide timing)", expanded=False):
-        st.markdown("""
-> Dinner is kept light because you need the insulin dip before your peptide injection 1 hour after eating.
+        # Step 4: Save
+        st.divider()
+        n_entries = sum(len(v) for v in day_log.values())
+        if st.button(f"\U0001f4be Save Today's Log ({n_entries} items)", type="primary",
+                     use_container_width=True, key="save_nutr_log"):
+            if n_entries == 0:
+                st.warning("No items to save — add some foods first.")
+            else:
+                with st.spinner("Saving to Google Sheets…"):
+                    ok = save_nutrition_entries(date_str, day_type, day_log)
+                if ok:
+                    st.success(f"✅ Saved {n_entries} entries for {date_str}!")
 
-**Option 1 — Shrimp Stir-Fry**
-| Food | Amount |
-|---|---|
-| Shrimp | 150g |
-| Cooked white rice | 100g |
-| Mixed vegetables | 100g |
-| Sesame oil | 5ml |
+    # ── SUB-TAB 2: FOOD LIBRARY ───────────────────────────────
+    with nutr_sub[1]:
+        st.markdown("### \U0001f4da Food Library")
+        st.caption("All foods and recipes with full macro data.")
 
-*Macros: ~32g P / 6g F / 32g C*
+        cat_filter = st.radio(
+            "Category", ["All", "protein", "carb", "veg", "fat", "recipe"],
+            horizontal=True, key="food_lib_filter",
+        )
 
-**Option 2 — Sardines on Toast**
-| Food | Amount |
-|---|---|
-| Sardines in olive oil (drained) | 100g (1 can) |
-| Whole grain toast | 1 slice (30g) |
-| Mixed greens + lemon | 80g |
+        lib_rows = []
+        for fn, fd in sorted(FOODS.items()):
+            if cat_filter != "All" and fd["cat"] != cat_filter:
+                continue
+            lib_rows.append({
+                "Food": fn,
+                "Category": fd["cat"],
+                "Protein (g)": fd["p"],
+                "Carbs (g)": fd["c"],
+                "Fat (g)": fd["f"],
+                "Calories": fd["kcal"],
+                "Per": fd.get("unit", "g"),
+            })
 
-*Macros: ~25g P / 12g F / 18g C*
+        if lib_rows:
+            st.dataframe(pd.DataFrame(lib_rows), use_container_width=True, hide_index=True)
+        else:
+            st.info("No items in this category.")
 
-**Option 3 — Tuna Bowl**
-| Food | Amount |
-|---|---|
-| Chunk light tuna (drained) | 120g (1.5 cans) |
-| Cooked rice | 80g |
-| Cucumber + tomato | 80g |
-| Olive oil + lemon | 5ml |
+    # ── SUB-TAB 3: TRENDS ────────────────────────────────────
+    with nutr_sub[2]:
+        st.markdown("### \U0001f4c8 Nutrition Trends")
+        st.caption("Data from saved nutrition logs. Save a few days of tracking first.")
 
-*Macros: ~34g P / 7g F / 28g C*
+        with st.spinner("Loading nutrition history…"):
+            nut_records = load_nutrition_log()
 
-**Option 4 — Salmon Fillet**
-| Food | Amount |
-|---|---|
-| Salmon fillet (baked/grilled) | 120g |
-| Sweet potato | 100g |
-| Steamed broccoli | 80g |
+        if not nut_records:
+            st.info("No logged nutrition data yet. Use Daily Tracker → Save to populate.")
+        else:
+            daily_agg = {}
+            for row in nut_records:
+                ds = str(row.get("date", ""))
+                if not ds:
+                    continue
+                if ds not in daily_agg:
+                    daily_agg[ds] = {"kcal": 0, "protein": 0, "carbs": 0, "fat": 0, "day_type": row.get("day_type", "")}
+                for key in ("kcal", "protein", "carbs", "fat"):
+                    try:
+                        daily_agg[ds][key] += float(row.get(key, 0) or 0)
+                    except (ValueError, TypeError):
+                        pass
 
-*Macros: ~28g P / 10g F / 28g C*
-""")
+            if len(daily_agg) < 2:
+                st.info("Log at least 2 days to see trend charts.")
+            else:
+                recent_dates = sorted(daily_agg.keys())[-14:]
+                agg_df = pd.DataFrame([{
+                    "Date": ds,
+                    "Calories": round(daily_agg[ds]["kcal"]),
+                    "Protein (g)": round(daily_agg[ds]["protein"]),
+                    "Carbs (g)": round(daily_agg[ds]["carbs"]),
+                    "Fat (g)": round(daily_agg[ds]["fat"]),
+                } for ds in recent_dates]).set_index("Date")
 
-    # Post-workout shake
-    with st.expander("Post-Workout Shake (~270 kcal) — training days only", expanded=False):
-        st.markdown("""
-| Food | Amount |
-|---|---|
-| Whey protein powder | 1 scoop (30g) |
-| Banana | half (60g) |
-| Natural almond butter | 10g |
-| Water | 240ml |
+                st.subheader("\U0001f525 Daily Calories vs Targets")
+                kcal_df = agg_df[["Calories"]].copy()
+                kcal_df["Training Target (1700)"] = 1700
+                kcal_df["Rest Target (1350)"] = 1350
+                st.line_chart(kcal_df)
 
-*Macros: ~28g P / 5g F / 20g C*
+                st.subheader("\U0001f969 Daily Protein vs 160g Target")
+                prot_df = agg_df[["Protein (g)"]].copy()
+                prot_df["Target (160g)"] = 160
+                st.line_chart(prot_df)
 
-> Take with your EAAs (Kion Cool Lime) intra or post-workout.
-> Rest days: skip the shake entirely.
-""")
+                st.subheader("\U0001f37d️ Macro Breakdown (last 14 days)")
+                st.bar_chart(agg_df[["Protein (g)", "Carbs (g)", "Fat (g)"]])
 
-    # --- Timing with Peptide Protocol ---
-    st.divider()
-    st.markdown("### Daily Timing Integration")
-    timing_md = """
-| Time | Activity | Nutrition Note |
-|---|---|---|
-| 6-8 AM | Breakfast + Supplements | Largest supplement window. Take fat-soluble vitamins with eggs/skyr. |
-| 12-1 PM | Lunch + Supplements | Biggest meal of the day (40%). Fertility stack here. |
-| 3-5 PM | Training (if applicable) | EAAs intra/post-workout. Post-WO shake after. |
-| 6-7 PM | Dinner (light) + Supplements | Keep it light. Only B12 + electrolytes. |
-| 7-8 PM | Peptide Injection | 1 hour after dinner. Empty-ish stomach. |
-| 9-10 PM | Sleep Stack | Mag glycinate + glycine + apigenin. |
-"""
-    st.markdown(timing_md)
+                wd = load_whoop_data()
+                if wd.get("daily"):
+                    st.subheader("\U0001f517 Whoop Correlation")
+                    corr_rows = []
+                    for ds in recent_dates:
+                        if ds not in wd["daily"]:
+                            continue
+                        next_ds = (datetime.strptime(ds, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+                        next_rec = wd["daily"].get(next_ds, {}).get("recovery")
+                        wd_day = wd["daily"][ds]
+                        corr_rows.append({
+                            "Date": ds,
+                            "Protein (g)": round(daily_agg[ds]["protein"]),
+                            "Calories": round(daily_agg[ds]["kcal"]),
+                            "Same-Day HRV": wd_day.get("hrv"),
+                            "Next-Day Recovery": next_rec,
+                            "Strain": wd_day.get("strain"),
+                        })
+                    if corr_rows:
+                        cdf = pd.DataFrame(corr_rows).set_index("Date")
+                        valid = cdf.dropna(subset=["Next-Day Recovery"])
+                        if not valid.empty:
+                            st.caption("Protein intake vs next-day Whoop recovery score")
+                            st.line_chart(valid[["Protein (g)", "Next-Day Recovery"]])
+                            st.dataframe(cdf.reset_index(), use_container_width=True, hide_index=True)
+                        else:
+                            st.info("Need more overlapping nutrition + Whoop data.")
+                    else:
+                        st.info("No overlapping Whoop + nutrition dates found.")
 
-    # --- 8-Week Projection ---
-    st.divider()
-    st.markdown("### 8-Week Projection")
-    proj_cols = st.columns(4)
-    with proj_cols[0]:
-        st.metric("Daily Deficit", "~317 kcal")
-    with proj_cols[1]:
-        st.metric("Weekly Fat Loss", "~0.63 lbs")
-    with proj_cols[2]:
-        st.metric("8-Week Fat Loss", "~5.1 lbs")
-    with proj_cols[3]:
-        st.metric("End Weight (est.)", "~175 lbs")
-    st.caption("Scale may show less change due to simultaneous muscle gain from training + peptides. Body composition (DEXA) is the true measure.")
+                st.subheader("\U0001f4cb Daily Log Summary")
+                st.dataframe(agg_df.reset_index(), use_container_width=True, hide_index=True)
+
 # ============================================================
 # TAB: DEXA BASELINE
 # ============================================================
